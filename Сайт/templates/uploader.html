@@ -1,0 +1,15 @@
+{%extends 'index1.html'%}
+{%block title%}
+Загрузка файлов
+{%endblock%}
+{%block section%}
+<div>
+      <form action = "http://localhost:5000/uploader" method = "POST"
+         enctype = "multipart/form-data">
+          <div class="mb-3">
+            <input type = "file" name = "file" accept=".pdf, .docx"/>
+              </div>
+         <input type ="submit"/>
+      </form>
+</div>
+{% endblock %}
