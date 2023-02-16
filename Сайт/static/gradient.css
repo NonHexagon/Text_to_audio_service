@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald:400,700');
+*
+{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Oswald', sans-serif;
+}
+.linear-gradient {
+    background: rgb(131,58,180);
+    background: linear-gradient(63deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+.text-container
+{
+    display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+nav
+{
+    background: rgb(238,174,202);
+    background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+}
+
+.bg-primary,
+.btn-primary,
+.badge-primary,
+.alert-primary {
+    background-image: linear-gradient(to right, #373b44, #4286f4);
+}
+
+header{
+    background: rgb(238,174,202);
+    background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+}
