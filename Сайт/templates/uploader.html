@@ -1,4 +1,4 @@
-{%extends 'index1.html'%}
+{%extends 'index.html'%}
 {%block title%}
 Загрузка файлов
 {%endblock%}
@@ -7,9 +7,9 @@
       <form action = "http://localhost:5000/uploader" method = "POST"
          enctype = "multipart/form-data">
           <div class="mb-3">
-            <input type = "file" name = "file" accept=".pdf, .docx"/>
-              </div>
-         <input type ="submit"/>
+            <input class="form-control" type="file" id="formFile" name = "file" accept=".pdf, .docx">
+          </div>
+         <input type ="submit" class="btn btn-light"/>
       </form>
 </div>
 {% endblock %}

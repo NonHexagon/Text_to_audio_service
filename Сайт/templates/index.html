@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="static/img/Beer_Beaten_35106.ico" type="image/x-icon">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/fontello.css">
-    <link rel="stylesheet" href="static/css/style.css">
-    <title>{%block title%}{%endblock%}</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="static/img/Beer_Beaten_35106.ico" type="image/x-icon">
+        <link rel="stylesheet" href="static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="static/css/fontello.css">
+        <link rel="stylesheet" href="static/css/style.css">
+        <title>{%block title%}{%endblock%}</title>
+    </head>
     <header>
         <div class="container">
             <div class="row">
@@ -27,23 +26,25 @@
             </div>
         </div>
     </header>
-    <section>
-        {%block section%}{%endblock%}
-    </section>
-    <footer id="footer">
+
+    <body>
+        <section>
+            {%block section%}{%endblock%}
+        </section>
+        <script src="js/bootstrap.bundle.min.js"></script>
+    </body>
+    <footer id="footer" style=color:white>
         <ul>
             <p>Ссылки на гит: </p>
             <li>
-            <a class="me-3 py-2 text-dark text-decoration-none" href="https://github.com/AgDeSs">Коланьков Никита</a>
+            <a class="me-3 py-2 text-light text-decoration-none" href="https://github.com/AgDeSs">Коланьков Никита</a>
             </li>
             <li>
-            <a class="me-3 py-2 text-dark text-decoration-none" href="https://github.com/MikeMarshall36">Королев Сергей</a>
+            <a class="me-3 py-2 text-light text-decoration-none" href="https://github.com/MikeMarshall36">Королев Сергей</a>
             </li>
             <li>
-            <a class="me-3 py-2 text-dark text-decoration-none" href="https://github.com/VladKsenobayt">Шалимов Константин</a>
+            <a class="me-3 py-2 text-light text-decoration-none" href="https://github.com/VladKsenobayt">Шалимов Константин</a>
             </li>
         </ul>
     </footer>
-    <script src="js/bootstrap.bundle.min.js"></script>
-</body>
 </html>
