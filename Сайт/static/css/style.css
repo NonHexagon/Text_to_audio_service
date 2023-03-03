@@ -41,11 +41,12 @@ border-radius:5px;
 
 footer {
     height: 0%;
-    bottom: 0%;
+    bottom: 2pt;
     left: 0;
     right: 0;
+    margin-top: 10pt;
     padding-bottom: 1pt;
-    padding-top: 1pt;
+    padding-top: 2pt;
     position: bottom;
     flex-shrink: 0;
 }
