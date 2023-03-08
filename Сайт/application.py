@@ -3,6 +3,7 @@ from pathlib import Path  # модуль для работы с путями, н
 from main import pdf_to_audio  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
 from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
+from datetime import datetime
 
 
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
@@ -12,6 +13,7 @@ db = SQLAlchemy(application)  # создаем экземпляр класса O
 
 
 class User(db.Model):  # таблица User базы данных
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)  # графа идентификатора
     user_name = db.Column(db.String(32), nullable=False)  # графа с именем пользователя
     e_mail = db.Column(db.String(64), nullable=False)  # поле данных почты
@@ -25,6 +27,7 @@ class User(db.Model):  # таблица User базы данных
 
 
 class File(db.Model):  # таблица файла в бд
+    __tablename__ = 'file'
     file_id = db.Column(db.Integer, primary_key=True)  # id
     file_name = db.Column(db.String(32), nullable=False)  # имя файла
     file = db.Column(db.BLOB)  # сам файл в типе blob (используется для хранения файлов в бд)
@@ -67,11 +70,15 @@ def uploader():  # обработчик
         file = request.files['file']  # получаем файл
         file.save(file.filename)  # сохраняем полученный файл
         print(f'[&]{file.filename}')  # вывод в консоль для отладки
-        inputFile_name = (f'./{file.filename}')  # Добавляем необходимые символы для работы конвертора
-        pdf_to_audio(inputFile_name)  # Производим конвертацию
-        file_name = Path(file.filename).stem  # Вырезаем имя файла
-        time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
-        return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
+        if Path(file.filename).stem == 'Californication':
+            print('True')
+            return send_file(f'easter_egg/Californication.mp3', as_attachment=True)
+        else:
+            inputFile_name = (f'./{file.filename}')  # Добавляем необходимые символы для работы конвертора
+            pdf_to_audio(inputFile_name)  # Производим конвертацию
+            file_name = Path(file.filename).stem  # Вырезаем имя файла
+            time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
+            return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
         return render_template('uploader.html')  # возвращаем страницу конвертора
 
