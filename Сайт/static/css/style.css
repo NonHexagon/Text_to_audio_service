@@ -41,14 +41,14 @@ border-radius:5px;
 
 footer {
     height: 0%;
-    bottom: 2pt;
+    bottom: 2vh;
     left: 0;
     right: 0;
-    margin-top: 10pt;
-    padding-bottom: 1pt;
+    margin-top: 3.3vh;
+    padding-bottom: 2%;
     padding-top: 2pt;
     position: bottom;
-    flex-shrink: 0;
+    flex-shrink: 2;
 }
 
 .example::-webkit-scrollbar {
