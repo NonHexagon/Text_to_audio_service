@@ -68,7 +68,11 @@ def about():  # обработчик пути
 def uploader():  # обработчик
     if request.method == 'POST':  # Проверка на запрос с методом POST
         file = request.files['file']  # получаем файл
-        file.save(file.filename)  # сохраняем полученный файл
+        try:
+            file.save(file.filename)  # сохраняем полученный файл
+        except FileNotFoundError:
+            print('Empty input')
+            return render_template('uploader.html', message ='Необходимо выбрать файл для озвучивания')
         print(f'[&]{file.filename}')  # вывод в консоль для отладки
         if Path(file.filename).stem == 'Californication':
             print('True')
