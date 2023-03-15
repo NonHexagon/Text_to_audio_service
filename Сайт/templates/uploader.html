@@ -3,6 +3,9 @@
 Загрузка файлов
 {%endblock%}
 {%block section%}
+<div class="container">
+  <p>{{ message }}<p>
+</div>
 <div>
       <form action = "http://localhost:5000/uploader" method = "POST"
          enctype = "multipart/form-data">
