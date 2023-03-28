@@ -1,4 +1,5 @@
 import time  # Импортируем модуль времени
+from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
 from main import pdf_to_audio  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
@@ -9,30 +10,6 @@ from datetime import datetime
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////First.db'  # инициализация базы данных в проекте
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # игнорируем не работающую часть пакета (она нам не нужна)
-db = SQLAlchemy(application)  # создаем экземпляр класса ORM
-
-
-class User(db.Model):  # таблица User базы данных
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)  # графа идентификатора
-    user_name = db.Column(db.String(32), nullable=False)  # графа с именем пользователя
-    e_mail = db.Column(db.String(64), nullable=False)  # поле данных почты
-    passwd = db.Column(db.String(32), nullable=False)  # поле пароля (позже будет храниться в зашифрованном виде)
-
-    def __init__(self, file_id, user_name, passwd, e_mail):  # инициализация класса User (она же таблица, но у нас ORM)
-        self.passwd = passwd.strip()  # присваиваем соответствующие значения, при этом удаляем пробелы
-        self.e_mail = e_mail.srtip()
-        self.user_name = user_name.strip()
-        self.file_id = [File(file_id=file_id)]  # делаем ссылку на вторую таблицу, где есть нужная нам строка
-
-
-class File(db.Model):  # таблица файла в бд
-    __tablename__ = 'file'
-    file_id = db.Column(db.Integer, primary_key=True)  # id
-    file_name = db.Column(db.String(32), nullable=False)  # имя файла
-    file = db.Column(db.BLOB)  # сам файл в типе blob (используется для хранения файлов в бд)
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # id пользователя-владельца
-    user_id = db.relationship("User", backref=db.backref('file_id', lazy=True))  # ссылка на другую таблицу
 
 
 @application.route('/home', methods=['GET'])  # прописываем пути для достижения домашней страницы
@@ -85,6 +62,32 @@ def uploader():  # обработчик
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
         return render_template('uploader.html')  # возвращаем страницу конвертора
+
+
+@application.route('/register', methods=['POST', 'GET'])  # Объявление нужных методов
+def registration():
+    if request.method == 'POST':
+        user_name = str(request.form['user_name']).strip()  # Получаем данные из формы
+        print(user_name)
+        f_name = str(request.form['f_name']).strip()
+        print(f_name)
+        l_name = str(request.form['l_name']).strip()
+        print(l_name)
+        email = str(request.form['email']).strip()
+        print(email)
+        tmp_passwd = 'no_passwd_yet'  # пароль пока не используется
+        new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd)
+        try:
+            session_db = Session()  # Выполняем запись в бд
+            session_db.add(new_user)
+            session_db.commit()
+            print(f'Был добавлен новый пользователь: {l_name} {f_name} с ником {user_name}')
+        except AttributeError:  # Обработка ошибки атрибутов (иногда случается)
+            return 'Что-то пошло не так!'
+        return redirect('/')
+
+    elif request.method == 'GET':
+        return render_template('register_form.html')  # Возвращаем рендер страницы
 
 
 if __name__ == '__main__':  # Создаем точку доступа
