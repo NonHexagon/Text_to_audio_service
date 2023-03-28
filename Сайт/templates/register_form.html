@@ -1,0 +1,26 @@
+{%extends 'index.html'%}
+{%block title%}
+О нас
+{%endblock%}
+{%block section%}
+<h1>Регистрационная форма</h1>
+<form method="post">
+  <div class="card">
+    <div class="form-group">
+      <label for="user_name">Имя пользователя (никнейм)</label>
+      <input type="text" name="user_name" id="user_name" placeholder="Введите имя пользователя"><br>
+      <small>Оно будет использоваться как уникальный номер, так что изменить его будет нельзя!</small>
+    </div><br>
+    <label>Ваше имя</label>
+    <input type="text" name="f_name" id="f_name" placeholder="Имя"><br>
+    <label>Ваша фамилия</label>
+    <input type="text" name="l_name" id="l_name" placeholder="Фамилия"><br>
+    <label>Почта</label>
+    <input type="email" name="email" id="email" placeholder="example@mail.com">
+    <small>Так как мы не хотим чтобы вы запоминали тысячи паролей - пароль будет каждый раз приходить на почтовый адрес</small><br>
+    <input type="submit" class="btn btn-info" value="Зарегистрироваться">
+    <br>
+    <a href="/" class="btn btn-danger">Отменить</a>
+  </div>
+</form>
+{%endblock%}
