@@ -1,4 +1,5 @@
 import time  # Импортируем модуль времени
+from workwithpsswordandemail import send_message, generate_password
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
 from main import pdf_to_audio  # модуль для конвертации
@@ -10,6 +11,7 @@ from datetime import datetime
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////First.db'  # инициализация базы данных в проекте
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # игнорируем не работающую часть пакета (она нам не нужна)
+application.config['SECRET_KEY'] = 'i-could-bleed-for-a-smile-could-die-for-a-gun'
 
 
 @application.route('/home', methods=['GET'])  # прописываем пути для достижения домашней страницы
@@ -49,7 +51,7 @@ def uploader():  # обработчик
             file.save(file.filename)  # сохраняем полученный файл
         except FileNotFoundError:
             print('Empty input')
-            return render_template('uploader.html', message ='Необходимо выбрать файл для озвучивания')
+            return render_template('uploader.html', message='Необходимо выбрать файл для озвучивания')
         print(f'[&]{file.filename}')  # вывод в консоль для отладки
         if Path(file.filename).stem == 'Californication':
             print('True')
@@ -75,19 +77,27 @@ def registration():
         print(l_name)
         email = str(request.form['email']).strip()
         print(email)
-        tmp_passwd = 'no_passwd_yet'  # пароль пока не используется
+        tmp_passwd = str(generate_password())  # пароль пока не используется
         new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd)
         try:
             session_db = Session()  # Выполняем запись в бд
             session_db.add(new_user)
             session_db.commit()
+            send_message(email, tmp_passwd)
             print(f'Был добавлен новый пользователь: {l_name} {f_name} с ником {user_name}')
         except AttributeError:  # Обработка ошибки атрибутов (иногда случается)
             return 'Что-то пошло не так!'
-        return redirect('/')
+        return redirect('/login')
 
     elif request.method == 'GET':
         return render_template('register_form.html')  # Возвращаем рендер страницы
+
+
+
+@application.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
 
 
 if __name__ == '__main__':  # Создаем точку доступа
