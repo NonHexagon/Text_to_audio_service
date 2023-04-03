@@ -1,0 +1,21 @@
+{%extends 'index.html'%}
+{%block title%}
+Вход в систему
+{%endblock%}
+{%block section%}
+<h1>Регистрационная форма</h1>
+<form method="post">
+  <div class="card">
+    <div class="form-group">
+    <label>Почта</label>
+    <input type="email" name="email" id="email" placeholder="example@mail.com"><br>
+        <label>Временный пароль</label><br>
+        <small>Он был выслан вам на почту</small><br>
+        <input type="password" name="tmp_passwd" id="tmp_passwd" placeholder="123456"><br>
+    <input type="submit" class="btn btn-info" value="Войти">
+    <br>
+    <a href="/" class="btn btn-danger">Отменить</a>
+    </div>
+  </div>
+</form>
+{%endblock%}
