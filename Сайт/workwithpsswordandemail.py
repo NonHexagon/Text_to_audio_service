@@ -4,7 +4,7 @@ import sqlite3
 import smtplib
 from random import randint
 import ssl
-from voice import _mail, _passwd
+from keys import _mail, _passwd
 
 
 # from datetime import datetime  #для времени создания пароля
