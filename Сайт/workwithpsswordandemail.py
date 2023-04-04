@@ -4,6 +4,7 @@ import sqlite3
 import smtplib
 from random import randint
 import ssl
+from voice import _mail, _passwd
 
 
 # from datetime import datetime  #для времени создания пароля
@@ -17,13 +18,14 @@ def send_message(mail, text):  # Отправка сообщения польз�
     # name = name[0][0]
     # user_name = user_name[0][0]
 
-    text = ("Subject: Here is your temperate password: " + text + "It will change next time").strip()
+    text = ("Subject: Here is your temperate password: " + text + " It will change next time").strip()
     print(text)
-    our_mail = 'texttoaudiopi201@outlook.com'  # наша почта НЕ ПЕРЕНОСИТЬ С OUTLOOK
+    our_mail = str(_mail)  # наша почта
     SSL_context = ssl.create_default_context()
-    with smtplib.SMTP("smtp-mail.outlook.com", 587) as server:  # подключение к почтовому серверу
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:  # подключение к почтовому серверу
+        server.ehlo()
         server.starttls(context=SSL_context)  # шифрование
-        server.login(our_mail, 'qdf12345fd')  # вход на нашу почту
+        server.login(our_mail, _passwd)  # вход на нашу почту | используется пароль приложения Google почты!
         server.sendmail(our_mail, mail, text)  # отправка
 
 
@@ -51,4 +53,4 @@ def generate_password():
 
 if __name__ == '__main__':  # Создаем точку доступа
     print(generate_password())
-    send_message('204543@edu.fa.ru', 'Hello there!')
+    send_message('204543@edu.fa.ru', 'Hello there, you filthy bastard!')
