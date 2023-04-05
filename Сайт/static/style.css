@@ -13,7 +13,7 @@ body
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
-	background: #80bac2;
+	background: rgb(66, 64, 64);
 
 
 }
@@ -38,7 +38,7 @@ ul li
 	list-style: none;
 	width: 200px;
 	padding: 15px;
-	background: #DCDCDC;
+	background: #e3e3e3;
     z-index: var(--i);
     transition: 0.5s;
 
@@ -47,7 +47,7 @@ ul li
 
 ul li:hover
 {
-    background: #096673;
+    background: #c90808;
     transform: translateX(-50px);
 }
 
@@ -59,7 +59,7 @@ ul li::before
     left: -40px;
     width: 40px;
     height: 100%;
-    background: #D3D3D3;
+    background: #c9c9c9;
     transform-origin: right;
     transform: skewY(45deg);
     transition: 0.5s;
@@ -67,7 +67,7 @@ ul li::before
 
 ul li:hover::before
 {
-    background: #0a3a40;
+    background: #a11010;
 }
 
 ul li::after
@@ -78,7 +78,7 @@ ul li::after
     left:0;
     width: 100%;
     height: 40px;
-    background: #d5e4e5;
+    background: #d9d4d4;
     transform-origin: bottom;
     transform: skewX(45deg);
     transition: 0.5s;
@@ -86,7 +86,7 @@ ul li::after
 
 ul li:hover::after
 {
-    background: #0b4e57;
+    background: #940f0f;
 }
 
 ul li a
