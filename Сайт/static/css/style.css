@@ -1,11 +1,12 @@
 body {
-    background: #80bac2;
+    background: #212020;
 }
 
 section {
-    margin-left: 480px;
-    margin-right: 480px;
+    margin-left: 700px;
+    margin-right: 700px;
     margin-top: 120px;
+    margin-bottom: 236px;
 }
 
 nav {
@@ -17,7 +18,7 @@ section {
   padding: 0% 0;
 }
 
-footer, header {
+header, footer {
       background: rgb(66, 64, 64);
 }
 
