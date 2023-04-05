@@ -5,12 +5,13 @@
 {%block section%}
 <h1>Регистрационная форма</h1>
 <form method="post">
-  <div class="card">
-    <div class="form-group">
-      <label for="user_name">Имя пользователя (никнейм)</label>
+  <div class="card-deck">
+    <div class="card">
+      <div class="card body">
+        <label for="user_name">Имя пользователя (никнейм)</label>
       <input type="text" name="user_name" id="user_name" placeholder="Введите имя пользователя"><br>
       <small>Оно будет использоваться как уникальный номер, так что изменить его будет нельзя!</small>
-    </div><br>
+      <br>
     <label>Ваше имя</label>
     <input type="text" name="f_name" id="f_name" placeholder="Имя"><br>
     <label>Ваша фамилия</label>
@@ -18,9 +19,18 @@
     <label>Почта</label>
     <input type="email" name="email" id="email" placeholder="example@mail.com">
     <small>Так как мы не хотим чтобы вы запоминали тысячи паролей - пароль будет каждый раз приходить на почтовый адрес</small><br>
-    <input type="submit" class="btn btn-info" value="Зарегистрироваться">
+    <input href="/login.html" type="submit" class="btn btn-secondary" value="Зарегистрироваться">
     <br>
-    <a href="/" class="btn btn-danger">Отменить</a>
+    <a href="/login" class="btn btn-secondary">Войти</a>
+    <small>Если у вас есть уже аккаунт, вам сюда</small>
+    <br>
+    <a href="/" class="btn btn-secondary">Отменить</a>
+      </div>
+    </div>
   </div>
 </form>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
 {%endblock%}

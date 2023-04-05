@@ -21,6 +21,8 @@
                         <a class="me-3 py-2 text-dark text-decoration-none" href="/uploader">Загрузка файлов</a>
                         <a class="me-3 py-2 text-dark text-decoration-none" href="/guide">Инструкция</a>
                         <a class="me-3 py-2 text-dark text-decoration-none" href="/settings">Настройки</a>
+                        <a class="me-3 py-2 text-dark text-decoration-none" href="/register">Регистрация</a>
+                        <a class="me-3 py-2 text-dark text-decoration-none" href="/login">Войти</a>
                     </nav>
                 </div>
             </div>
@@ -34,6 +36,7 @@
         <script src="js/bootstrap.bundle.min.js"></script>
     </body>
     <footer id="footer" style=color:white>
+       {%block footer%}
         <ul>
             <p>Ссылки на гит: </p>
             <li>
@@ -49,5 +52,6 @@
                 <a class="me-3 py-2 text-light text-decoration-none" href="https://github.com/NonHexagon/Text_to_audio_service">Репозиторий проекта</a>
             </li>
         </ul>
+        {%endblock%}
     </footer>
 </html>

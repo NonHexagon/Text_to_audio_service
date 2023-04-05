@@ -3,19 +3,24 @@
 Вход в систему
 {%endblock%}
 {%block section%}
-<h1>Регистрационная форма</h1>
+<h1>Авторизация</h1>
 <form method="post">
   <div class="card">
-    <div class="form-group">
     <label>Почта</label>
     <input type="email" name="email" id="email" placeholder="example@mail.com"><br>
-        <label>Временный пароль</label><br>
-        <small>Он был выслан вам на почту</small><br>
-        <input type="password" name="tmp_passwd" id="tmp_passwd" placeholder="123456"><br>
-    <input type="submit" class="btn btn-info" value="Войти">
+      <label>Временный пароль</label><br>
+      <small>Он был выслан вам на почту</small><br>
+      <input type="password" name="tmp_passwd" id="tmp_passwd" placeholder="123456"><br>
+    <input href="uplo" type="submit" class="btn btn-secondary" value="Войти">
     <br>
-    <a href="/" class="btn btn-danger">Отменить</a>
-    </div>
+    <a href="/register" class="btn btn-secondary">Зарегистрироваться</a>
+    <small>Если у вас нет аккаунта, вам сюда</small>
+    <br>
+    <a href="/" class="btn btn-secondary">Отменить</a>
   </div>
 </form>
 {%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}о
