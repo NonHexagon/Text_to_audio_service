@@ -2,7 +2,8 @@
 import re
 import sqlite3
 import smtplib
-from random import randint
+from email.mime.text import MIMEText
+from random import choice
 import ssl
 from keys import _mail, _passwd
 
@@ -18,18 +19,20 @@ def send_message(mail, text):  # Отправка сообщения польз�
     # name = name[0][0]
     # user_name = user_name[0][0]
 
-    text = ("Subject: Here is your temperate password: " + text + " It will change next time").strip()
-    print(text)
     our_mail = str(_mail)  # наша почта
+    message = MIMEText('{user_name} Here is your temperate password: {text} '.format(user_name="Спасибо",text=text))
+    message['From'] = our_mail
+    message['To'] = mail
+    message['Subject'] = 'Your password'
     SSL_context = ssl.create_default_context()
     with smtplib.SMTP("smtp.gmail.com", 587) as server:  # подключение к почтовому серверу
         server.ehlo()
         server.starttls(context=SSL_context)  # шифрование
         server.login(our_mail, _passwd)  # вход на нашу почту | используется пароль приложения Google почты!
-        server.sendmail(our_mail, mail, text)  # отправка
+        server.sendmail(our_mail, mail, message.as_string())  # отправка
 
 
-# проверка корректности ввода почта
+# проверка корректности ввода почты
 def check_email(email):
     email_form = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'  # шаблон
     if re.fullmatch(email_form, email):
@@ -44,10 +47,10 @@ def check_email(email):
 
 # генерация пароля
 def generate_password():
-    passwd = str(randint(0, 99999))
-    len_ = 6
-
-    passwd = passwd.zfill(len_)  # добивание до нужной длины
+    simbols = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    passwd = ''
+    for i in range(8):
+        passwd += choice(simbols)
     return passwd
 
 
