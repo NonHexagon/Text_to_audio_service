@@ -21,6 +21,8 @@ class Users(Base):
     l_name = Column(String(80), nullable=False)
     email = Column(String(80), nullable=False)
     tmp_passwd = Column(String(16), nullable=False)
+    timestamp = Column(String(26), nullable=False)
+    next_time = Column(String(26), nullable=False)
 
     def __repr__(self):
         return f'<User (user name = {self.user_name}, first name = {self.f_name})>'
