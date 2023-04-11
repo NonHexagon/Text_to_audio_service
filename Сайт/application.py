@@ -1,11 +1,12 @@
 import time  # Импортируем модуль времени
-from workwithpsswordandemail import send_message, generate_password
+from workwithpasswordandemail import send_message, generate_password
+from DB_manager import login_check
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
 from main import pdf_to_audio  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
+from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
-from datetime import datetime
 
 
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
@@ -78,7 +79,11 @@ def registration():
         email = str(request.form['email']).strip()
         print(email)
         tmp_passwd = str(generate_password())  # пароль пока не используется
-        new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd)
+        timestamp = str(datetime.now())
+        next_time = str(datetime.now() + timedelta(minutes=5))
+
+        new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd,\
+                         timestamp=timestamp, next_time=next_time)
         try:
             session_db = Session()  # Выполняем запись в бд
             session_db.add(new_user)
@@ -98,6 +103,13 @@ def registration():
 def login():
     if request.method == 'GET':
         return render_template('login.html')
+    if request.method == 'POST':
+        input_passwd = str(request.form['tmp_passwd'])
+        input_email = str(request.form['email'])
+        if login_check(input_email, input_passwd):
+            return redirect('/uploader')
+        else:
+            return redirect('/register')
 
 
 if __name__ == '__main__':  # Создаем точку доступа
