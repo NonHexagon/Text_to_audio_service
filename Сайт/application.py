@@ -46,6 +46,10 @@ def about():  # обработчик пути
 
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
 def uploader():  # обработчик
+    keys_arr = list(songs_dict.keys())
+    s_name = str(random.choice(keys_arr)).title()
+    print(s_name)
+    text = songs_dict.get(s_name)
     if request.method == 'POST':  # Проверка на запрос с методом POST
         file = request.files['file']  # получаем файл
         try:
@@ -53,10 +57,10 @@ def uploader():  # обработчик
         except FileNotFoundError:
             print('Empty input')
             return render_template('uploader.html', message='Необходимо выбрать файл для озвучивания')
-        print(f'[&]{file.filename}')  # вывод в консоль для отладки
-        if Path(file.filename).stem == 'Californication':
+        print(f'[&] {file.filename}')  # вывод в консоль для отладки
+        if str(Path(file.filename).stem).title() == s_name:
             print('True')
-            return send_file(f'easter_egg/Californication.mp3', as_attachment=True)
+            return send_file(f'easter_egg/{s_name}.mp3', as_attachment=True)
         else:
             inputFile_name = (f'./{file.filename}')  # Добавляем необходимые символы для работы конвертора
             pdf_to_audio(inputFile_name)  # Производим конвертацию
@@ -64,7 +68,8 @@ def uploader():  # обработчик
             time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
-        return render_template('uploader.html')  # возвращаем страницу конвертора
+
+        return render_template('uploader.html', s_name=s_name, text=text)  # возвращаем страницу конвертора
 
 
 @application.route('/register', methods=['POST', 'GET'])  # Объявление нужных методов
