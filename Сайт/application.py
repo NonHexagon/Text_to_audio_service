@@ -1,13 +1,15 @@
+import os
 import time  # Импортируем модуль времени
-from workwithpasswordandemail import send_message, generate_password
+import random
+import Example_texts
+from workwithpsswordandemail import send_message, generate_password
 from Example_texts import songs_dict
-from DB_manager import login_check
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
-from main import pdf_to_audio  # модуль для конвертации
+from main import pdf_to_audio, clear_folder  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
-from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
+from datetime import datetime
 
 
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
@@ -59,9 +61,9 @@ def uploader():  # обработчик
             print('Empty input')
             return render_template('uploader.html', message='Необходимо выбрать файл для озвучивания')
         print(f'[&] {file.filename}')  # вывод в консоль для отладки
-        if str(Path(file.filename).stem).title() == s_name:
+        if str(Path(file.filename).stem).title() in keys_arr:
             print('True')
-            return send_file(f'easter_egg/{s_name}.mp3', as_attachment=True)
+            return send_file(f'easter_egg/{Path(file.filename).stem}.mp3', as_attachment=True)
         else:
             inputFile_name = (f'./{file.filename}')  # Добавляем необходимые символы для работы конвертора
             pdf_to_audio(inputFile_name)  # Производим конвертацию
@@ -69,7 +71,7 @@ def uploader():  # обработчик
             time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
-
+        clear_folder('./files')
         return render_template('uploader.html', s_name=s_name, text=text)  # возвращаем страницу конвертора
 
 
@@ -85,11 +87,7 @@ def registration():
         email = str(request.form['email']).strip()
         print(email)
         tmp_passwd = str(generate_password())  # пароль пока не используется
-        timestamp = str(datetime.now())
-        next_time = str(datetime.now() + timedelta(minutes=5))
-
-        new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd,\
-                         timestamp=timestamp, next_time=next_time)
+        new_user = Users(user_name=user_name, f_name=f_name, l_name=l_name, email=email, tmp_passwd=tmp_passwd)
         try:
             session_db = Session()  # Выполняем запись в бд
             session_db.add(new_user)
@@ -104,18 +102,10 @@ def registration():
         return render_template('register_form.html')  # Возвращаем рендер страницы
 
 
-
 @application.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'GET':
         return render_template('login.html')
-    if request.method == 'POST':
-        input_passwd = str(request.form['tmp_passwd'])
-        input_email = str(request.form['email'])
-        if login_check(input_email, input_passwd):
-            return redirect('/uploader')
-        else:
-            return redirect('/register')
 
 
 if __name__ == '__main__':  # Создаем точку доступа
