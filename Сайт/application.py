@@ -1,5 +1,6 @@
 import time  # Импортируем модуль времени
 from workwithpasswordandemail import send_message, generate_password
+from Example_texts import songs_dict
 from DB_manager import login_check
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
