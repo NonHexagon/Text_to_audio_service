@@ -1,4 +1,6 @@
 import pyttsx3  # модуль для озвучки текса (используя голоса операционной системы)
+from tkinter import Tk
+import os, shutil
 import pdfplumber  # модуль для чтения pdf файлов
 from multiprocessing import Process  # модуль для создания отдельных процессов
 from pathlib import Path  # модуль для работы с путями в файловой системе
@@ -33,7 +35,21 @@ def work_with_text(doc_text, file_path):  # конвертор
     return print(f'[+] {file_name} has been converted to audio!')  # маркер готовности файла
 
 
+def clear_folder(path: str):
+    folder = path
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+
 def pdf_to_audio_processor(file_path='./'):  # Считывает файл и вызывает конвертор
+    root = Tk()
     if Path(file_path).is_file() and Path(file_path).suffix == '.pdf':  # проверка на pdf файл
         print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
         with pdfplumber.PDF(open(file=file_path, mode='rb')) as pdf:  # чтение файла
@@ -44,8 +60,10 @@ def pdf_to_audio_processor(file_path='./'):  # Считывает файл и в
     elif Path(file_path).is_file() and Path(file_path).suffix == '.docx':  # проверка на docx файл
         print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
         doc_text = str(docx2txt.process(file_path)).replace('\n', ' ')  # переносим все в одну строку
+        root.bell()
         return work_with_text(doc_text, file_path)
     else:  # если файл не был найден или не имеет поддерживаемого расширения
+        root.bell()
         return print('[!] File not found')  # выводим в консоль сообщение
 
 
