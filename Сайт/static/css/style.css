@@ -2,6 +2,10 @@ body {
     background: #212020;
 }
 
+#just-new-line{
+white-space: pre-wrap;
+}
+
 section {
     margin-left: 700px;
     margin-right: 700px;
