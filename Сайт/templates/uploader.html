@@ -3,8 +3,10 @@
 Загрузка файлов
 {%endblock%}
 {%block section%}
+<div class="container">
+  <p>{{ message }}<p>
+</div>
 <div>
-    <p style="color:red">{{ message }}<p>
       <form action = "http://localhost:5000/uploader" method = "POST"
          enctype = "multipart/form-data">
           <div class="mb-3">
@@ -13,27 +15,10 @@
          <input type ="submit" class="btn btn-light"/>
       </form>
 </div>
-<br>
-<div class="card-deck">
-    <div class="card">
-        <div class="card-body">
-            <h4>Чтобы проверить работу сервиса, можно создать файл Californication с расширением .docx или .pdf</h4>
-            <h5>Используйте этот текст:</h5>
-            <h7>Space may be the final frontier<br>
-                But it's made in a Hollywood basement<br>
-                Cobain can you hear the spheres<br>
-                Singing songs off station to station<br>
-                And Alderon's not far away<br>
-                It's Californication<br>
-                Born and raised by those who praise<br>
-                Control of population<br>
-                everybody's been there<br>
-                And I don't mean on vacation<br>
-                First born unicorn <br>
-                Hard core soft porn <br>
-            </h7>
-        </div>
-    </div>
+<div>
+    <h2>Чтобы проверить работу сервиса, можно создать файл '{{ s_name }}' с расширением .docx или .pdf</h2>
+    <h3>Используйте этот текст:</h3>
+    <p id="just-new-line"> {{ text }} </p>
 </div>
 {% endblock %}
 
