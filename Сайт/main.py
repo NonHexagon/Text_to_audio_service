@@ -62,6 +62,12 @@ def pdf_to_audio_processor(file_path='./'):  # Считывает файл и в
         doc_text = str(docx2txt.process(file_path)).replace('\n', ' ')  # переносим все в одну строку
         root.bell()
         return work_with_text(doc_text, file_path)
+    elif Path(file_path).is_file() and Path(file_path).suffix == '.txt':  # проверка на txt файл
+        print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
+        with open(file_path, 'r') as f:
+            doc_text = f.read()
+        doc_text = doc_text.replace('\n', ' ')  # переносим все в одну строку
+        return work_with_text(doc_text, file_path)
     else:  # если файл не был найден или не имеет поддерживаемого расширения
         root.bell()
         return print('[!] File not found')  # выводим в консоль сообщение
