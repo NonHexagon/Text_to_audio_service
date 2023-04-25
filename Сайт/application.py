@@ -55,24 +55,33 @@ def uploader():  # обработчик
     text = songs_dict.get(s_name)
     if request.method == 'POST':  # Проверка на запрос с методом POST
         file = request.files['file']  # получаем файл
+        file_name=file.filename
         try:
-            file.save(file.filename)  # сохраняем полученный файл
+            file.save(file_name)  # сохраняем полученный файл
         except FileNotFoundError:
-            print('Empty input')
-            return render_template('uploader.html', message='Необходимо выбрать файл для озвучивания')
-        print(f'[&] {file.filename}')  # вывод в консоль для отладки
-        if str(Path(file.filename).stem).title() in keys_arr:
+            text = str(request.form['inp_text']).strip()  # Проверяем записи в текстовом поле
+            if text=="":  # Пустое поле
+                print('Empty input')
+                return render_template('uploader.html', message='Необходимо выбрать файл для озвучивания')
+            else:
+                file_name='Text_to_audio_service'+str(time.time())+'.txt'  # создаём файл с текстом из поля
+                with open(f'./{file_name}', 'w') as f:
+                    f.write(text)
+                print(f'Create file {file_name} for text from textblo')
+        print(f'[&] {file_name}')  # вывод в консоль для отладки
+        if str(Path(file_name).stem).title() in keys_arr:
             print('True')
-            return send_file(f'easter_egg/{Path(file.filename).stem}.mp3', as_attachment=True)
+            return send_file(f'easter_egg/{Path(file_name).stem}.mp3', as_attachment=True)
         else:
-            inputFile_name = (f'./{file.filename}')  # Добавляем необходимые символы для работы конвертора
+            inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
             pdf_to_audio(inputFile_name)  # Производим конвертацию
-            file_name = Path(file.filename).stem  # Вырезаем имя файла
+            file_name = Path(file_name).stem  # Вырезаем имя файла
             time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
         clear_folder('./files')
         return render_template('uploader.html', s_name=s_name, text=text)  # возвращаем страницу конвертора
+
 
 
 @application.route('/register', methods=['POST', 'GET'])  # Объявление нужных методов
