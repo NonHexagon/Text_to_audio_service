@@ -1,12 +1,13 @@
-import pyttsx3  # модуль для озвучки текса (используя голоса операционной системы)
-from tkinter import Tk
-import os, shutil
-import pdfplumber  # модуль для чтения pdf файлов
+import os  # модуль для взаимодействия с операционной системой
+import shutil
 from multiprocessing import Process  # модуль для создания отдельных процессов
 from pathlib import Path  # модуль для работы с путями в файловой системе
-import os  # модуль для взаимодействия с операционной системой
+from tkinter import Tk
+
 import docx2txt  # модуль для чтения docx файла
 import langid  # модуль для определения языка
+import pdfplumber  # модуль для чтения pdf файлов
+import pyttsx3  # модуль для озвучки текса (используя голоса операционной системы)
 
 
 def pdf_to_audio(file_path='/'):  # Функция для запуска конвертора в отдельном процессе
