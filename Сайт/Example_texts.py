@@ -83,4 +83,51 @@ First born unicorn\t
 
 """
 
-songs_dict = {'Wonderful Life': Text_1, 'Nobody Praying For Me': Text_2, 'In The End': Text_3, 'Californication': Text_4}
+Text_5 = """
+Everything’s changed, everything’s changed\t
+Pouring out liquor in the pouring rain\t
+Let it go cold\t
+Silent stage\t
+Everything’s changed, everything’s changed\t
+All my people in the same old bars\t
+All my people with the same old scars\t
+But everything’s changed, everything’s changed\t
+Say what you, say what you will\t
+\t
+I’ve been living in the dark for a long, long time\t
+But I see better at night\t
+\t
+Baby, ‘cause you, you are my shining star\t
+Because you, you are my shining\t
+You are my shining star\t
+And I’ll hold you closer if you go supernova\t
+You will be, you will be\t
+Forever my shining, ever my shining star\t
+Forever my shining, ever my shining star\t
+"""
+
+Text_6 = """
+Каждую ночь ты сидишь у окна\t
+Перемещая звезды\t
+Каждую ночь тебе не до сна\t
+Все это так серьезно\t
+Я помню, я знаю\t
+Ветер в твоих руках\t
+Искусственным раем\t
+Бредишь в своих мечтах\t
+\t
+Нажми на кнопку - получишь в результат\t
+И твоя мечта осуществится\t
+Нажми на кнопку, но что же ты не рад\t
+Тебе больше не к чему стремиться\t
+\t
+"""
+
+
+songs_dict = {'Wonderful Life': Text_1, 'Nobody Praying For Me': Text_2, 'In The End': Text_3,
+              'Californication': Text_4, 'Shining': Text_5, 'Нажми На Кнопку': Text_6}
+
+if __name__ == '__main__':  # Создаем точку доступа
+    print(list(songs_dict.keys()))
+    print('wonderful life'.title())
+    print(list(songs_dict.keys()))
