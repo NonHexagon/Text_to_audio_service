@@ -4,6 +4,7 @@ import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 from random import choice
+from DataBase import get_user_name
 import ssl
 from keys import _mail, _passwd
 
@@ -20,7 +21,8 @@ def send_message(mail, text):  # Отправка сообщения польз�
     # user_name = user_name[0][0]
 
     our_mail = str(_mail)  # наша почта
-    message = MIMEText('{user_name} Here is your temperate password: {text} '.format(user_name="Спасибо",text=text))
+    message = MIMEText('{user_name} Here is your temperate password: {text} '.format(user_name=f"{get_user_name(mail)}",
+                                                                                     text=text))
     message['From'] = our_mail
     message['To'] = mail
     message['Subject'] = 'Your password'
