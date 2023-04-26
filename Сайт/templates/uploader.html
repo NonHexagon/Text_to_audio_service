@@ -3,18 +3,24 @@
 Загрузка файлов
 {%endblock%}
 {%block section%}
+{% if error %}
+    <p class=error><strong style="color: red;">Произошла ошибка:</strong> {{ error }}</p>
+  {% endif %}
 <div class="container">
-  <p>{{ message }}<p>
+
 </div>
 <div>
       <form action = "http://localhost:5000/uploader" method = "POST"
          enctype = "multipart/form-data">
           <div class="mb-3">
+              <label><h1>Загрузить файл</h1></label>
             <input class="form-control" type="file" id="formFile" name = "file" accept=".pdf, .docx, .txt">
           </div>
           <div>
-            <input type="text" id="inp_text" name="inp_text">
+              <label><h3>Ввести текст</h3></label><br>
+            <input type="text" id="inp_text" name="inp_text" placeholder="Введите текст для озвучки" style="width: 50%;">
           </div>
+          <br>
          <input type ="submit" class="btn btn-light"/>
       </form>
 </div>
