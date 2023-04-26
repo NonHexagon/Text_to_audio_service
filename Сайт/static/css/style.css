@@ -1,5 +1,24 @@
+@font-face {
+    font-family: '5mal6Lampen';
+    src: url('fonts/5mal6Lampen.eot');
+    src: url('fonts/5mal6Lampen.eot?#iefix') format('embedded-opentype'),
+        url('fonts/5mal6Lampen.woff2') format('woff2'),
+        url('fonts/5mal6Lampen.woff') format('woff'),
+        url('fonts/5mal6Lampen.svg#5mal6Lampen') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.your-style {
+    font-family: '5mal6Lampen';
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
-    background: #212020;
+    background: #80bac2;
+    font-family: '5mal6Lampen';
 }
 
 #just-new-line{
@@ -9,25 +28,42 @@ white-space: pre-wrap;
 section {
     margin-left: 25%;
     margin-right: 25%;
-    margin-top: 120px;
-    margin-bottom: 236px;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    font-family: '5mal6Lampen';
+	font-size: 20px;
 }
+
+h2,
+h3 {
+font-family: '5mal6Lampen';
+}
+
 
 nav {
 border-radius: 10px;
+font-family: '5mal6Lampen';
 }
+
+input[type="text"] {
+   border: 1px solid #cccccc;
+   border-radius: 3px;
+   font-size: 11px;
+   font-family: font-family: '5mal6Lampen';
+   }
+
 
 footer,
 section {
   padding: 0% 0;
 }
 
-header, footer {
+footer, header {
       background: rgb(66, 64, 64);
 }
 
 header {
-  padding: 25px 0;
+  padding: 20px 0;
 }
 
 h3 {
