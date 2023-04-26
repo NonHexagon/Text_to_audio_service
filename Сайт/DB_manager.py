@@ -1,6 +1,7 @@
 import sqlite3
+import threading
 from datetime import datetime, timedelta
-from workwithpasswordandemail import generate_password, send_message
+from workwithpsswordandemail import generate_password, send_message
 DataBase = sqlite3.connect('main.db', check_same_thread=False)
 cursor = DataBase.cursor()
 
@@ -31,13 +32,12 @@ def change_passwd():
             if str(datetime.now()) >= str(next_date[0][0]):
                 cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{email[0]}'")
                 cursor.execute(f"UPDATE users SET timestamp = next_time WHERE email == '{email[0]}'")
-                cursor.execute(f"UPDATE users SET next_time = '{datetime.now() + timedelta(minutes=5)}'\
+                cursor.execute(f"UPDATE users SET next_time = '{datetime.now() + timedelta(minutes=10)}'\
                 WHERE email == '{email[0]}'")
                 DataBase.commit()
                 print(f'Пароль изменен и выслан на почту \033[33m{email[0]}\033[0m!\
-                \033[36mСледующее изменение в {datetime.now() + timedelta(minutes=5)}\033[0m')
+                \033[36mСледующее изменение в {datetime.now() + timedelta(minutes=10)}\033[0m')
                 send_message(email[0], passwd_1)
-        pass
 
 
 if __name__ == '__main__':  # Создаем точку доступа
@@ -54,4 +54,17 @@ if __name__ == '__main__':  # Создаем точку доступа
 
     print(*passwd)
     print(login_check(mail, '1fQI2Tgx'))
-    change_passwd()
+    threading.Thread(target=change_passwd())
+"""
+Что изменилось:
+1)Отправка сообщений стала быстрее
+2)Есть возможность не загружать файл с текстом, а записывать текст в строку и получать озвученный файл
+3)Добавлена поддержка txt файлов
+4)Теперь письма именные (Письмо содержит имя пользователя указанной почты)
+5)Ускорено изменение пароля
+6)Изменен шрифт на всем сайте (Пока тестируем, а дальше видно будет)
+7)На некоторых страницах скорректирован стиль
+
+Что в планах:
+Сделать одно приложение для запуска всех компонентов сервиса
+"""
