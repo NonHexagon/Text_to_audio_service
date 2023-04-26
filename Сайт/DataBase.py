@@ -40,3 +40,11 @@ class File(Base):
 
 
 Base.metadata.create_all(engine)
+
+
+def get_user_name(mail_address: str) -> str:
+    DB = sqlite3.connect('main.db', check_same_thread=False)
+    cursor = DB.cursor()
+    user_name = cursor.execute(f"SELECT user_name FROM users WHERE email == '{mail_address}'").fetchall()
+    print(f'У {str(user_name[0][0])} не заводиться жига!!!')
+    return str(user_name[0][0])
