@@ -1,0 +1,2 @@
+Copyright (c) 2018 by Peter Wiegel.   Open Font under Terms of following Free Software Licenses:
+GPL (General Public License) with font-exception and OFL (Open Font License)
