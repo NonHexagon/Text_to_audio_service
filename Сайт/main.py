@@ -10,18 +10,22 @@ import pdfplumber  # модуль для чтения pdf файлов
 import pyttsx3  # модуль для озвучки текса (используя голоса операционной системы)
 
 
-def pdf_to_audio(file_path='/'):  # Функция для запуска конвертора в отдельном процессе
-    p = Process(target=pdf_to_audio_processor(file_path))  # инициализация процесса
+def pdf_to_audio(file_path='/', playbackspeed=120):  # Функция для запуска конвертора в отдельном процессе
+    p = Process(target=pdf_to_audio_processor(file_path, 120))  # инициализация процесса
     p.start()  # запуск процесса
     p.join()  # завершение процесса
 
 
-def work_with_text(doc_text, file_path):  # конвертор
+audio = pyttsx3.init()
+
+
+def work_with_text(doc_text, file_path, playbackspeed):  # конвертор
+    print(playbackspeed)
     print(doc_text)  # вывод строки
     lang = langid.classify(doc_text)[0]  # определение языка текста
-    audio = pyttsx3.init()  # инициализация чтения
+    # инициализация чтения
     print(lang)  # вывод языка
-    audio.setProperty('rate', 120)
+    audio.setProperty('rate', playbackspeed)
     ru = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_RU-RU_IRINA_11.0'  # читалка на русском
     en = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0'  # читалка на англ
 
@@ -49,32 +53,32 @@ def clear_folder(path: str):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-def pdf_to_audio_processor(file_path='./'):  # Считывает файл и вызывает конвертор
+def pdf_to_audio_processor(file_path='./', playbackspeed=120):  # Считывает файл и вызывает конвертор
     root = Tk()
     if Path(file_path).is_file() and Path(file_path).suffix == '.pdf':  # проверка на pdf файл
         print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
         with pdfplumber.PDF(open(file=file_path, mode='rb')) as pdf:  # чтение файла
             pages = [pages.extract_text() for pages in pdf.pages]  # переносим все в одну строку
         doc_text = ''.join(pages).replace('\n', ' ')
-        return work_with_text(doc_text, file_path)
+        return work_with_text(doc_text, file_path, playbackspeed)
 
     elif Path(file_path).is_file() and Path(file_path).suffix == '.docx':  # проверка на docx файл
         print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
         doc_text = str(docx2txt.process(file_path)).replace('\n', ' ')  # переносим все в одну строку
         root.bell()
-        return work_with_text(doc_text, file_path)
+        return work_with_text(doc_text, file_path, playbackspeed)
     elif Path(file_path).is_file() and Path(file_path).suffix == '.txt':  # проверка на txt файл
         print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
         with open(file_path, 'r') as f:
             doc_text = f.read()
         doc_text = doc_text.replace('\n', ' ')  # переносим все в одну строку
-        return work_with_text(doc_text, file_path)
+        return work_with_text(doc_text, file_path, playbackspeed)
     else:  # если файл не был найден или не имеет поддерживаемого расширения
         root.bell()
         return print('[!] File not found')  # выводим в консоль сообщение
 
 
 if __name__ == "__main__":  # создаем точку доступа
-    p = Process(target=pdf_to_audio_processor('./californication.docx'))  # инициализируем процесс для проверки
+    p = Process(target=pdf_to_audio_processor('./californication.docx', 120))  # инициализируем процесс для проверки
     p.start()  # запускаем процесс
     p.join()  # завершаем процесс
