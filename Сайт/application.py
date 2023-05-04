@@ -4,7 +4,7 @@ import random
 import threading
 import Example_texts
 from workwithpsswordandemail import send_message, generate_password
-from DB_manager import login_check
+from DB_manager import login_check, user_mails, reset_passwd
 from Example_texts import songs_dict
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
@@ -18,6 +18,7 @@ application = Flask(__name__)  # инициализация экземпляра
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////First.db'  # инициализация базы данных в проекте
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # игнорируем не работающую часть пакета (она нам не нужна)
 application.config['SECRET_KEY'] = 'i-could-bleed-for-a-smile-could-die-for-a-gun'
+playback_speed = 0
 
 
 @application.route('/home', methods=['GET'])  # прописываем пути для достижения домашней страницы
@@ -39,9 +40,24 @@ def guide():  # отлов путей
     return render_template('guide.html')  # возврат страницы
 
 
-@application.route('/settings', methods=['GET'])  # путь к странице с настройками
+@application.route('/settings', methods=['GET', 'POST'])  # путь к странице с настройками
 def settings():  # поиск обращений к определенному пути
-    return render_template('settings.html')  # возврат страницы с настройками
+    if request.method == 'POST':
+        global playback_speed
+        mail = str(request.form['reset_mail'])
+        tmp_passwd = str(generate_password())
+        playback_speed = request.form['audio_speed']
+        if (playback_speed != 0 or playback_speed != '') and playback_speed.isnumeric():
+            print('got this', type(playback_speed))
+            playback_speed = int(playback_speed)
+            return redirect('/uploader')
+        elif mail != '':
+            reset_passwd(mail)
+            return redirect('/login')
+        elif type(playback_speed) == str:
+            playback_speed = 120
+    elif request.method == 'GET':
+        return render_template('settings.html')  # возврат страницы с настройками
 
 
 @application.route('/about', methods=['GET'])  # Страница о нас (но зачем?)
@@ -51,6 +67,7 @@ def about():  # обработчик пути
 
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
 def uploader():  # обработчик
+    global playback_speed
     keys_arr = list(songs_dict.keys())
     s_name = str(random.choice(keys_arr)).title()
     text_ = songs_dict.get(s_name)
@@ -77,7 +94,8 @@ def uploader():  # обработчик
             return send_file(f'easter_egg/{Path(file_name).stem}.mp3', as_attachment=True)
         else:
             inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
-            pdf_to_audio(inputFile_name)  # Производим конвертацию
+            print(playback_speed)
+            pdf_to_audio(inputFile_name, playbackspeed=playback_speed)  # Производим конвертацию
             file_name = Path(file_name).stem  # Вырезаем имя файла
             time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
@@ -131,9 +149,5 @@ def login():
 
 
 if __name__ == '__main__':  # Создаем точку доступа
-    application.run(debug=False)  # Запускаем приложение без опции дебага
-"""
-Ограничение по расширению файла прописаны в коде html странице, так что здесь их нет и не будет.
-К бд обращений пока нет, так как сама схема требует доработок и исправлений.
-В дальнейших версиях добавим бд и взаимодействие с ней, а пока она висит как заглушка. 
-"""
+    port = int(os.environ.get("PORT", 5000))
+    application.run(host='0.0.0.0', port=port, debug=False)  # Запускаем приложение без опции дебага
