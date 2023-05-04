@@ -4,15 +4,20 @@
 {%endblock%}
 {%block section%}
 <div class="card-deck">
-        <div class="card">
-                <div class="card-body">
-                    <h3>Здесь нет контента...</h3>
-                    <h5>На данной странице будут настройки</h5>
-                    <h6>Но на данный момент здесь пустота</h6><br>
-                    <p>Держи мем (он смешной, честно)</p>
-                    <img src="static/img/mem.jpg" alt="Главное верить" width="475" height="475">
-                </div>
-        </div>
+
+                    <h3 class="me-3 py-2 text-light text-decoration-none">Здесь нет контента...</h3>
+                    <h5 class="me-3 py-2 text-light text-decoration-none">На данной странице будут настройки</h5>
+                    <h6 class="me-3 py-2 text-light text-decoration-none">Но на данный момент здесь пустота</h6><br>
+                    <p class="me-3 py-2 text-light text-decoration-none">Держи мем (он смешной, честно)</p>
+                    <img src="static/img/mem.jpg" alt="Главное верить" width="475" height="475"><br>
+    <form method="post">
+        <label class="me-3 py-2 text-light text-decoration-none">Скорость воспроизведения записи</label>
+        <input type="text" class="me-3 py-2 text-dark text-decoration-none" name="audio_speed" id="audio_speed" placeholder="Введите скорость воспроизведения"><br>
+        <input type="submit" class="btn btn-secondary" value="Применить настройки">
+        <label class="me-3 py-2 text-light text-decoration-none">Сброс пароля пользователя</label>
+        <input type="email" class="me-3 py-2 text-dark text-decoration-none" name="reset_mail" id="reset_mail" placeholder="example@amil.com"><br>
+    </form>
+
 </div>
 {%endblock%}
 
