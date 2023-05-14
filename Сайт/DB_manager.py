@@ -1,5 +1,6 @@
 import sqlite3
 import threading
+from DataBase import Users, File
 from datetime import datetime, timedelta
 from workwithpsswordandemail import generate_password, send_message
 DataBase = sqlite3.connect('main.db', check_same_thread=False)
@@ -40,7 +41,48 @@ def change_passwd():
                 send_message(email[0], passwd_1)
 
 
-def reset_passwd(user_mail: str):
+def get_user_class_id(user_id: int) -> DataBase:
+    if user_id != 0:
+        _id = user_id
+        _user_name = cursor.execute(f"SELECT user_name FROM users WHERE id = {_id}").fetchone()
+        print('Имя пользователя: ', _user_name)
+        if _user_name:
+            _f_name = cursor.execute(f"SELECT f_name FROM users WHERE id = {_id}").fetchone()
+            _l_name = cursor.execute(f"SELECT l_name FROM users WHERE id = {_id}").fetchone()
+            _email = cursor.execute(f"SELECT email FROM users WHERE id = {_id}").fetchone()
+            _tmp_passwd = cursor.execute(f"SELECT tmp_passwd FROM users WHERE id = {_id}").fetchone()
+            _timestamp = cursor.execute(f"SELECT timestamp FROM users WHERE id = {_id}").fetchone()
+            _next_time = cursor.execute(f"SELECT next_time FROM users WHERE id = {_id}").fetchone()
+
+        else:
+            print('Ну нет такого!')
+            exit()
+        current_user = Users(id=_id, user_name=_user_name, f_name=_f_name, l_name=_l_name, email=_email,
+                             tmp_passwd=_tmp_passwd, timestamp=_timestamp, next_time=_next_time)
+        print(type(current_user))
+        return current_user
+
+
+def get_user_class_email(user_email: str) -> DataBase:
+    if user_email != '':
+        _id = cursor.execute(f"SELECT id FROM users WHERE email == '{user_email}'").fetchone()
+        if _id:
+            _user_name = cursor.execute(f"SELECT user_name FROM users WHERE email == '{user_email}'").fetchone()
+            _f_name = cursor.execute(f"SELECT f_name FROM users WHERE email == '{user_email}'").fetchone()
+            _l_name = cursor.execute(f"SELECT l_name FROM users WHERE email == '{user_email}'").fetchone()
+            _email = user_email
+            _tmp_passwd = cursor.execute(f"SELECT tmp_passwd FROM users WHERE email == '{user_email}'").fetchone()
+            _timestamp = cursor.execute(f"SELECT timestamp FROM users WHERE email == '{user_email}'").fetchone()
+            _next_time = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_email}'").fetchone()
+        else:
+            print('Ну нет такого!')
+            exit()
+        current_user = Users(id=_id, user_name=_user_name, f_name=_f_name, l_name=_l_name, email=_email,
+                             tmp_passwd=_tmp_passwd, timestamp=_timestamp, next_time=_next_time)
+        return current_user
+
+
+def reset_passwd(user_mail: str,):
     passwd_1 = generate_password()
     next_date = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_mail}'").fetchall()
     cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{user_mail}'")
@@ -57,6 +99,8 @@ user_mails = cursor.execute("SELECT email FROM users").fetchall()
 
 
 if __name__ == '__main__':  # Создаем точку доступа
+    username_id = cursor.execute("SELECT user_name FROM users WHERE id == 1").fetchone()
+    print(username_id)
     mail = str(input('Enter e-mail address: '))
     users = cursor.execute("SELECT DISTINCT * FROM users;").fetchall()
     files = cursor.execute("SELECT DISTINCT * FROM file;").fetchall()
@@ -69,18 +113,7 @@ if __name__ == '__main__':  # Создаем точку доступа
 
     print(*passwd)
     print(login_check(mail, '1fQI2Tgx'))
+    get_user_class_email('mister22898@mail.ru')
+    get_user_class_id(1)
     reset_passwd(mail)
     threading.Thread(target=change_passwd())
-"""
-Что изменилось:
-1)Отправка сообщений стала быстрее
-2)Есть возможность не загружать файл с текстом, а записывать текст в строку и получать озвученный файл
-3)Добавлена поддержка txt файлов
-4)Теперь письма именные (Письмо содержит имя пользователя указанной почты)
-5)Ускорено изменение пароля
-6)Изменен шрифт на всем сайте (Пока тестируем, а дальше видно будет)
-7)На некоторых страницах скорректирован стиль
-
-Что в планах:
-Сделать одно приложение для запуска всех компонентов сервиса
-"""
