@@ -4,12 +4,13 @@ import random
 import threading
 import Example_texts
 from workwithpsswordandemail import send_message, generate_password
-from DB_manager import login_check, user_mails, reset_passwd
+from DB_manager import login_check, user_mails, reset_passwd, get_user_class_id, get_user_class_email
 from Example_texts import songs_dict
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
 from main import pdf_to_audio, clear_folder  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
+from flask_login import *
 from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
 from datetime import datetime, timedelta
 
@@ -18,6 +19,8 @@ application = Flask(__name__)  # инициализация экземпляра
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////First.db'  # инициализация базы данных в проекте
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # игнорируем не работающую часть пакета (она нам не нужна)
 application.config['SECRET_KEY'] = 'i-could-bleed-for-a-smile-could-die-for-a-gun'
+login_manager = LoginManager()
+login_manager.init_app(application)
 playback_speed = 0
 
 
@@ -66,6 +69,7 @@ def about():  # обработчик пути
 
 
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
+@login_required
 def uploader():  # обработчик
     global playback_speed
     keys_arr = list(songs_dict.keys())
@@ -135,6 +139,16 @@ def registration():
         return render_template('register_form.html')  # Возвращаем рендер страницы
 
 
+@login_manager.user_loader
+def load_user(user):
+    user_ = list(user)
+    print(type(user_))
+    print(user_[1])
+    user_fin = int(user_[1])
+    logged_user = get_user_class_id(user_id=user_fin)
+    return logged_user
+
+
 @application.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'GET':
@@ -143,9 +157,30 @@ def login():
         input_passwd = str(request.form['tmp_passwd'])
         input_email = str(request.form['email'])
         if login_check(input_email, input_passwd):
+            logged_user = get_user_class_email(input_email)
+
+            req_page = redirect('next')
+
+            login_user(logged_user)
             return redirect('/uploader')
         else:
             return redirect('/register')
+
+
+@application.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect('main')
+
+
+@application.after_request
+def redirect_to_sing_in(response):
+    if response.status_code == 401:
+        return redirect(url_for('login') + '?next=' + request.url)
+
+    return response
+    pass
 
 
 if __name__ == '__main__':  # Создаем точку доступа
