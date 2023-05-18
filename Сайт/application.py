@@ -22,6 +22,7 @@ application.config['SECRET_KEY'] = 'i-could-bleed-for-a-smile-could-die-for-a-gu
 login_manager = LoginManager()
 login_manager.init_app(application)
 playback_speed = 0
+logged_user = Users()
 
 
 @application.route('/home', methods=['GET'])  # прописываем пути для достижения домашней страницы
@@ -141,6 +142,7 @@ def registration():
 
 @login_manager.user_loader
 def load_user(user):
+    global logged_user
     user_ = list(user)
     print(type(user_))
     print(user_[1])
@@ -151,6 +153,7 @@ def load_user(user):
 
 @application.route('/login', methods=['POST', 'GET'])
 def login():
+    global logged_user
     if request.method == 'GET':
         return render_template('login.html')
     if request.method == 'POST':
@@ -165,6 +168,17 @@ def login():
             return redirect('/uploader')
         else:
             return redirect('/register')
+
+
+@application.route('/account', methods=['POST', 'GET'])
+@login_required
+def account():
+    global logged_user
+    name = logged_user.f_name[0]
+    user = logged_user.user_name[0]
+    if request.method == 'GET':
+        return render_template('account.html', name=name, user=user)
+    pass
 
 
 @application.route('/logout', methods=['GET', 'POST'])
