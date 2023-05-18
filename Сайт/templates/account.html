@@ -1,0 +1,17 @@
+{%extends 'index.html'%}
+{%block title%}
+Личный кабинет {{user}}
+{%endblock%}
+{%block section%}
+<div>
+    <p>Привет, {{name}}!</p>
+    <a href="/logout" style="color:maroon">Выйти</a>>
+
+      
+</div>
+
+{% endblock %}
+
+{%block footer%}
+{{super()}}
+{%endblock%}
