@@ -72,7 +72,7 @@ def about():  # обработчик пути
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
 @login_required
 def uploader():  # обработчик
-    global playback_speed
+    global playback_speed, logged_user
     keys_arr = list(songs_dict.keys())
     s_name = str(random.choice(keys_arr)).title()
     text_ = songs_dict.get(s_name)
@@ -102,7 +102,15 @@ def uploader():  # обработчик
             print(playback_speed)
             pdf_to_audio(inputFile_name, playbackspeed=playback_speed)  # Производим конвертацию
             file_name = Path(file_name).stem  # Вырезаем имя файла
+            time_stamp = str(datetime.now())
+            user_id = logged_user.id
+            print(file_name, time_stamp, user_id)
+            new_file = File(file_name=file_name, file_date=time_stamp, file_owner=user_id)
+            session_db = Session()  # Выполняем запись в бд
+            session_db.add(new_file)
+            session_db.commit()
             time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
+            print('Данные: ', new_file.file_name, new_file.file_date)
             return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
         clear_folder('./files')
@@ -161,9 +169,7 @@ def login():
         input_email = str(request.form['email'])
         if login_check(input_email, input_passwd):
             logged_user = get_user_class_email(input_email)
-
             req_page = redirect('next')
-
             login_user(logged_user)
             return redirect('/uploader')
         else:
@@ -176,9 +182,9 @@ def account():
     global logged_user
     name = logged_user.f_name[0]
     user = logged_user.user_name[0]
+    l_name = logged_user.l_name[0]
     if request.method == 'GET':
-        return render_template('account.html', name=name, user=user)
-    pass
+        return render_template('account.html', name=name, user=user, l_name=l_name)
 
 
 @application.route('/logout', methods=['GET', 'POST'])

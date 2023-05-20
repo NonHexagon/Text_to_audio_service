@@ -33,7 +33,7 @@ class File(Base):
     __tablename__ = 'file'
     file_id = Column(Integer, Sequence('file_id_seq'), primary_key=True)
     file_name = Column(String, nullable=False)
-    # file_date = Column(Date)
+    file_date = Column(String(26), nullable=False)
     file_owner = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):

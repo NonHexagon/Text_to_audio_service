@@ -100,6 +100,8 @@ user_mails = cursor.execute("SELECT email FROM users").fetchall()
 
 if __name__ == '__main__':  # Создаем точку доступа
     username_id = cursor.execute("SELECT user_name FROM users WHERE id == 1").fetchone()
+    files = cursor.execute("SELECT * FROM file").fetchall()
+    print(files)
     print(username_id)
     mail = str(input('Enter e-mail address: '))
     users = cursor.execute("SELECT DISTINCT * FROM users;").fetchall()
@@ -115,5 +117,4 @@ if __name__ == '__main__':  # Создаем точку доступа
     print(login_check(mail, '1fQI2Tgx'))
     get_user_class_email('mister22898@mail.ru')
     get_user_class_id(1)
-    reset_passwd(mail)
     threading.Thread(target=change_passwd())
