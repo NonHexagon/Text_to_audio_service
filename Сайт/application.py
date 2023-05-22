@@ -149,18 +149,18 @@ def registration():
 
 
 @login_manager.user_loader
-def load_user(user):
-    global logged_user
-    user_ = list(user)
-    print(type(user_))
+def load_user(user):  # Функция загрузки пользователя
+    global logged_user 
+    user_ = list(user)  # Обрабатываем id пользователя
     print(user_[1])
     user_fin = int(user_[1])
-    logged_user = get_user_class_id(user_id=user_fin)
+    logged_user = get_user_class_id(user_id=user_fin)  # Получаем экземпляр класса пользователя по id
+    # Применяем данный механизм, так как у нас используется не db.Model, который имеет необходимые методы. В нашем случае пришлось создавать велосипед)
     return logged_user
 
 
 @application.route('/login', methods=['POST', 'GET'])
-def login():
+def login():  # Функция логирования пользователя. Пока он не выйдет, будет висеть как активный
     global logged_user
     if request.method == 'GET':
         return render_template('login.html')
@@ -169,17 +169,17 @@ def login():
         input_email = str(request.form['email'])
         if login_check(input_email, input_passwd):
             logged_user = get_user_class_email(input_email)
-            req_page = redirect('next')
+            req_page = redirect('next')  # Сохраняем путь, по которому пользоваетль хотел пройти до того, как вошел в личный кабинет
             login_user(logged_user)
-            return redirect('/uploader')
+            return redirect(req_page)
         else:
-            return redirect('/register')
+            return redirect('/register')  # Если нет учетной записи - перенаправляем на решистрацию. А то иж чо)
 
 
 @application.route('/account', methods=['POST', 'GET'])
 @login_required
-def account():
-    global logged_user
+def account():  # Обработка перехода в личный кабинет
+    global logged_user  # Глобальная переменная - экземпляр класса пользователя
     name = logged_user.f_name[0]
     user = logged_user.user_name[0]
     l_name = logged_user.l_name[0]
@@ -189,13 +189,13 @@ def account():
 
 @application.route('/logout', methods=['GET', 'POST'])
 @login_required
-def logout():
+def logout():  # Функция разлогирования пользователя из системы, с последующим перенаправлением на главную страницу
     logout_user()
     return redirect('main')
 
 
 @application.after_request
-def redirect_to_sing_in(response):
+def redirect_to_sing_in(response):  # Обработка требования входа в учетную запись. 
     if response.status_code == 401:
         return redirect(url_for('login') + '?next=' + request.url)
 
