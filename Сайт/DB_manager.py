@@ -1,13 +1,14 @@
-import sqlite3
-import threading
-from DataBase import Users, File
-from datetime import datetime, timedelta
-from workwithpsswordandemail import generate_password, send_message
-DataBase = sqlite3.connect('main.db', check_same_thread=False)
-cursor = DataBase.cursor()
+import sqlite3  # Импортируем драйвер для подкулчения к бд
+import threading  # Импортирем модульь для работы с потоками
+from DataBase import Users, File  # Берем из БАзы данных классы файла и пользователя
+from datetime import datetime, timedelta  # Импортируем модуль времени
+from workwithpsswordandemail import generate_password, send_message  # Из модуля для работы с почтой импортируем генератор пароля и функцию отпарвки сообщения
+
+DataBase = sqlite3.connect('main.db', check_same_thread=False)  # Подключаемся к базе данных
+cursor = DataBase.cursor()  # Созадем курсор базы данных
 
 
-def login_check(user_email: str, user_passwd: str) -> bool | str:
+def login_check(user_email: str, user_passwd: str) -> bool | str:  # Функция проверки наличия пользователя в бд
     db_email = cursor.execute("SELECT email FROM users").fetchall()
     container = []
     for i in range(len(db_email)):
@@ -24,7 +25,7 @@ def login_check(user_email: str, user_passwd: str) -> bool | str:
     print('Что-то пошло не так')
 
 
-def change_passwd():
+def change_passwd():  # Функция смены пароля 
     while True:
         emails = cursor.execute("SELECT email FROM users").fetchall()
         for email in emails:
@@ -41,7 +42,7 @@ def change_passwd():
                 send_message(email[0], passwd_1)
 
 
-def get_user_class_id(user_id: int) -> DataBase:
+def get_user_class_id(user_id: int) -> DataBase:  # Получение получения пользователя по id
     if user_id != 0:
         _id = user_id
         _user_name = cursor.execute(f"SELECT user_name FROM users WHERE id = {_id}").fetchone()
@@ -63,7 +64,7 @@ def get_user_class_id(user_id: int) -> DataBase:
         return current_user
 
 
-def get_user_class_email(user_email: str) -> DataBase:
+def get_user_class_email(user_email: str) -> DataBase:  # Функция получения пользователя из бд по почтовому адресу
     if user_email != '':
         _id = cursor.execute(f"SELECT id FROM users WHERE email == '{user_email}'").fetchone()
         if _id:
@@ -82,7 +83,7 @@ def get_user_class_email(user_email: str) -> DataBase:
         return current_user
 
 
-def reset_passwd(user_mail: str,):
+def reset_passwd(user_mail: str,):  # Сброс пароля пользователя по мейлу
     passwd_1 = generate_password()
     next_date = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_mail}'").fetchall()
     cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{user_mail}'")
