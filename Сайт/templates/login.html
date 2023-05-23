@@ -3,21 +3,21 @@
 Вход в систему
 {%endblock%}
 {%block section%}
-<h1>Авторизация</h1>
-<form method="post">
-  <div class="card">
-    <label>Почта</label>
-    <input type="email" name="email" id="email" placeholder="example@mail.com"><br>
+<h1 class="me-3 py-2 text-light text-decoration-none">Авторизация</h1>
+<form method="post" class="me-3 py-2 text-light text-decoration-none">
+
+    <label>Почта</label><br>
+    <input type="email" name="email" id="email" placeholder="example@mail.com" required><br>
       <label>Временный пароль</label><br>
       <small>Он был выслан вам на почту</small><br>
-      <input type="password" name="tmp_passwd" id="tmp_passwd" placeholder="123456"><br>
+      <input type="password" name="tmp_passwd" id="tmp_passwd" placeholder="123456" required><br>
     <input href="uplo" type="submit" class="btn btn-secondary" value="Войти">
     <br>
-    <a href="/register" class="btn btn-secondary">Зарегистрироваться</a>
     <small>Если у вас нет аккаунта, вам сюда</small>
+    <a href="/register" class="btn btn-warning">Зарегистрироваться</a><br>
     <br>
-    <a href="/" class="btn btn-secondary">Отменить</a>
-  </div>
+    <a href="/" class="btn btn-danger">Отменить</a>
+
 </form>
 {%endblock%}
 
