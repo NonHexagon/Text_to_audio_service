@@ -45,10 +45,17 @@ h3 {
 font-family: '5mal6Lampen';
 }
 
+a {
+margin: 1%;
+}
 
 nav {
 border-radius: 10px;
 font-family: '5mal6Lampen';
+}
+
+input[type="submit"]{
+margin-top: 1%;
 }
 
 input[type="text"] {
@@ -92,6 +99,7 @@ justify-content: center;
 }
 
 }
+
 img{
 border-radius:5px;
 }
@@ -103,7 +111,7 @@ border-radius:5px;
   width: 8px;
 
 .example::-webkit-scrollbar-thumb {
-  background-color: #888; 
+  background-color: #888;
   border-radius: 4px;
 }
 
