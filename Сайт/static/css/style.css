@@ -71,6 +71,18 @@ html, body {
     margin: 0;
 }
 
+th{
+    color: yellow;
+}
+
+td{
+    padding:1%;
+}
+
+table{
+    width: 80%;
+}
+
 footer
 {
   text-align: left;
