@@ -1,14 +1,14 @@
-import sqlite3  # Импортируем драйвер для подкулчения к бд
-import threading  # Импортирем модульь для работы с потоками
-from DataBase import Users, File  # Берем из БАзы данных классы файла и пользователя
-from datetime import datetime, timedelta  # Импортируем модуль времени
-from workwithpsswordandemail import generate_password, send_message  # Из модуля для работы с почтой импортируем генератор пароля и функцию отпарвки сообщения
+import sqlite3
+import threading
+import pandas as pd
+from DataBase import Users
+from datetime import datetime, timedelta
+from workwithpsswordandemail import generate_password, send_message
+DataBase = sqlite3.connect('main.db', check_same_thread=False)
+cursor = DataBase.cursor()
 
-DataBase = sqlite3.connect('main.db', check_same_thread=False)  # Подключаемся к базе данных
-cursor = DataBase.cursor()  # Созадем курсор базы данных
 
-
-def login_check(user_email: str, user_passwd: str) -> bool | str:  # Функция проверки наличия пользователя в бд
+def login_check(user_email: str, user_passwd: str) -> bool | str:
     db_email = cursor.execute("SELECT email FROM users").fetchall()
     container = []
     for i in range(len(db_email)):
@@ -25,7 +25,7 @@ def login_check(user_email: str, user_passwd: str) -> bool | str:  # Функц�
     print('Что-то пошло не так')
 
 
-def change_passwd():  # Функция смены пароля 
+def change_passwd():
     while True:
         emails = cursor.execute("SELECT email FROM users").fetchall()
         for email in emails:
@@ -42,7 +42,7 @@ def change_passwd():  # Функция смены пароля
                 send_message(email[0], passwd_1)
 
 
-def get_user_class_id(user_id: int) -> DataBase:  # Получение получения пользователя по id
+def get_user_class_id(user_id: int) -> DataBase:
     if user_id != 0:
         _id = user_id
         _user_name = cursor.execute(f"SELECT user_name FROM users WHERE id = {_id}").fetchone()
@@ -64,7 +64,7 @@ def get_user_class_id(user_id: int) -> DataBase:  # Получение полу�
         return current_user
 
 
-def get_user_class_email(user_email: str) -> DataBase:  # Функция получения пользователя из бд по почтовому адресу
+def get_user_class_email(user_email: str) -> DataBase:
     if user_email != '':
         _id = cursor.execute(f"SELECT id FROM users WHERE email == '{user_email}'").fetchone()
         if _id:
@@ -83,7 +83,7 @@ def get_user_class_email(user_email: str) -> DataBase:  # Функция пол�
         return current_user
 
 
-def reset_passwd(user_mail: str,):  # Сброс пароля пользователя по мейлу
+def reset_passwd(user_mail: str,):
     passwd_1 = generate_password()
     next_date = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_mail}'").fetchall()
     cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{user_mail}'")
@@ -93,7 +93,18 @@ def reset_passwd(user_mail: str,):  # Сброс пароля пользоват
     DataBase.commit()
     print(f'Пароль сброшен и выслан на почту \033[36m{user_mail}\033[0m!\
     \033[36mСледующее изменение в {datetime.now() + timedelta(minutes=120)}\033[0m')
-    send_message(user_mail, passwd_1)
+    trunner = threading.Thread(send_message(user_mail, passwd_1))
+    trunner.start()
+    trunner.join()
+
+
+def get_files(user_id):
+    user_files = cursor.execute(f"SELECT * FROM file WHERE file_owner == {user_id}").fetchall()
+    df = pd.DataFrame(columns=['Название файла', 'Дата конвертации'])
+
+    for i in range(len(user_files)):
+        df.loc[i] = [user_files[i][1]] + [user_files[i][2]]
+    return df
 
 
 user_mails = cursor.execute("SELECT email FROM users").fetchall()
@@ -108,6 +119,7 @@ if __name__ == '__main__':  # Создаем точку доступа
     users = cursor.execute("SELECT DISTINCT * FROM users;").fetchall()
     files = cursor.execute("SELECT DISTINCT * FROM file;").fetchall()
     passwd = cursor.execute(f"SELECT tmp_passwd FROM users WHERE email == '{mail}'").fetchall()
+    get_files(1)
     print(user_mails)
     for user in users:
         print(f'Пользователь: {user}')
@@ -118,4 +130,6 @@ if __name__ == '__main__':  # Создаем точку доступа
     print(login_check(mail, '1fQI2Tgx'))
     get_user_class_email('mister22898@mail.ru')
     get_user_class_id(1)
-    threading.Thread(target=change_passwd())
+    runner = threading.Thread(target=change_passwd())
+    runner.start()
+    runner.join()

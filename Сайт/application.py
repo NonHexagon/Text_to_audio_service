@@ -4,8 +4,10 @@ import random
 import threading
 import Example_texts
 from workwithpsswordandemail import send_message, generate_password
-from DB_manager import login_check, user_mails, reset_passwd, get_user_class_id, get_user_class_email
+from multiprocessing import Process  # модуль для создания отдельных процессов
+from DB_manager import login_check, user_mails, reset_passwd, get_user_class_id, get_user_class_email, get_files
 from Example_texts import songs_dict
+import pandas as pd
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
 from main import pdf_to_audio, clear_folder  # модуль для конвертации
@@ -67,6 +69,15 @@ def settings():  # поиск обращений к определенному �
 @application.route('/about', methods=['GET'])  # Страница о нас (но зачем?)
 def about():  # обработчик пути
     return render_template('about.html')  # Возврат страницы (таков путь)
+
+
+@application.route('/reset_passwd', methods=['GET'])
+def reset():
+    global logged_user
+    p = Process(target=reset_passwd(logged_user.email[0]))  # инициализация процесса
+    p.start()  # запуск процесса
+    p.join()  # завершение процесса
+    return redirect('/login')
 
 
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
@@ -149,18 +160,18 @@ def registration():
 
 
 @login_manager.user_loader
-def load_user(user):  # Функция загрузки пользователя
-    global logged_user 
-    user_ = list(user)  # Обрабатываем id пользователя
+def load_user(user):
+    global logged_user
+    user_ = list(user)
+    print(type(user_))
     print(user_[1])
     user_fin = int(user_[1])
-    logged_user = get_user_class_id(user_id=user_fin)  # Получаем экземпляр класса пользователя по id
-    # Применяем данный механизм, так как у нас используется не db.Model, который имеет необходимые методы. В нашем случае пришлось создавать велосипед)
+    logged_user = get_user_class_id(user_id=user_fin)
     return logged_user
 
 
 @application.route('/login', methods=['POST', 'GET'])
-def login():  # Функция логирования пользователя. Пока он не выйдет, будет висеть как активный
+def login():
     global logged_user
     if request.method == 'GET':
         return render_template('login.html')
@@ -169,36 +180,36 @@ def login():  # Функция логирования пользователя. 
         input_email = str(request.form['email'])
         if login_check(input_email, input_passwd):
             logged_user = get_user_class_email(input_email)
-            req_page = redirect('next')  # Сохраняем путь, по которому пользоваетль хотел пройти до того, как вошел в личный кабинет
             login_user(logged_user)
-            return redirect(req_page)
+            return redirect('/uploader')
         else:
-            return redirect('/register')  # Если нет учетной записи - перенаправляем на решистрацию. А то иж чо)
+            return redirect('/register')
 
 
 @application.route('/account', methods=['POST', 'GET'])
 @login_required
-def account():  # Обработка перехода в личный кабинет
-    global logged_user  # Глобальная переменная - экземпляр класса пользователя
+def account():
+    global logged_user
     name = logged_user.f_name[0]
     user = logged_user.user_name[0]
     l_name = logged_user.l_name[0]
+    files_ = get_files(logged_user.id)
     if request.method == 'GET':
-        return render_template('account.html', name=name, user=user, l_name=l_name)
+        return render_template('account.html', name=name, user=user, l_name=l_name,
+                               tables=[files_.to_html(classes='data', header='true', index=False, justify='center')])
 
 
 @application.route('/logout', methods=['GET', 'POST'])
 @login_required
-def logout():  # Функция разлогирования пользователя из системы, с последующим перенаправлением на главную страницу
+def logout():
     logout_user()
     return redirect('main')
 
 
 @application.after_request
-def redirect_to_sing_in(response):  # Обработка требования входа в учетную запись. 
+def redirect_to_sing_in(response):
     if response.status_code == 401:
         return redirect(url_for('login') + '?next=' + request.url)
-
     return response
     pass
 
