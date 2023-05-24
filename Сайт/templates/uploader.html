@@ -4,7 +4,7 @@
 {%endblock%}
 {%block section%}
 {% if error %}
-    <p class=error><strong style="color: red;">Произошла ошибка:</strong> {{ error }}</p>
+    <p class=error style="color: white;"><strong style="color: red;">Произошла ошибка:</strong > {{ error }}</p>
   {% endif %}
 <div class="container">
 
@@ -13,11 +13,12 @@
       <form action = "http://localhost:5000/uploader" method = "POST"
          enctype = "multipart/form-data">
           <div class="mb-3">
-              <label><h1>Загрузить файл</h1></label>
+
+              <label><h1 class="me-3 py-2 text-light text-decoration-none">Загрузить файл</h1></label>
             <input class="form-control" type="file" id="formFile" name = "file" accept=".pdf, .docx, .txt">
           </div>
           <div>
-              <label><h3>Ввести текст</h3></label><br>
+              <label><h3 class="me-3 py-2 text-light text-decoration-none">Ввести текст</h3></label><br>
             <input type="text" id="inp_text" name="inp_text" placeholder="Введите текст для озвучки" style="width: 50%;">
           </div>
           <br>
@@ -25,9 +26,9 @@
       </form>
 </div>
 <div>
-    <h2>Чтобы проверить работу сервиса, можно создать файл '{{ s_name }}' с расширением .docx или .pdf</h2>
-    <h3>Используйте этот текст:</h3>
-    <p id="just-new-line"> {{ text }} </p>
+    <h2 class="me-3 py-2 text-light text-decoration-none">Чтобы проверить работу сервиса, можно создать файл '{{ s_name }}' с расширением .docx или .pdf</h2>
+    <h3 class="me-3 py-2 text-light text-decoration-none">Используйте этот текст:</h3>
+    <p id="just-new-line" class="me-3 py-2 text-light text-decoration-none"> {{ text }} </p>
 </div>
 {% endblock %}
 
