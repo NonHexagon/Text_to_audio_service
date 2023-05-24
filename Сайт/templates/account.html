@@ -12,7 +12,7 @@
     </div>
     <label class="me-3 py-2 text-light text-decoration-none">Файлы:</label>
     <div  class="me-3 py-2 text-light text-decoration-none">
-        {% if tables|length > 0 %}
+        {% if files_|length > 0 %}
         <table>
         {% for table in tables %}
 
@@ -21,13 +21,12 @@
         {% endfor %}
         </table>
         {% else %}
-        <h5>Пока вы не конвертировали ни одного файла,<br> но вы можете исправить это <a href="\uploader">здесь</a></h5>
+        <h5>Пока вы не конвертировали ни одного файла,<br> но вы можете исправить это <a href="\uploader" style="color:#BC9D50;">здесь</a></h5>
     </div>
 
-    <a href="/reset_passwd" class="btn btn-warning">Сбросить пароль</a>
-    <a href="/logout" class="btn btn-danger">Выйти</a>>
-
       {% endif %}
+    <a href="/reset_passwd" class="btn btn-warning">Сбросить пароль</a>
+    <a href="/logout" class="btn btn-danger">Выйти</a>
 </div>
 
 {% endblock %}
