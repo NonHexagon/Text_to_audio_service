@@ -1,0 +1,28 @@
+{%extends 'index.html'%}
+{%block title%}
+Загрузка файлов
+{%endblock%}
+{%block section%}
+{% if error %}
+    <p class=error style="color: white;"><strong style="color: red;">Произошла ошибка:</strong > {{ error }}</p>
+  {% endif %}
+<div class="container">
+
+</div>
+<div>
+      <form action = "http://localhost:5000/textloader" method = "POST"
+         enctype = "multipart/form-data">
+          <div>
+              <label><h3 class="me-3 py-2 text-light text-decoration-none">Ввести текст</h3></label><br>
+            <input type="text" id="inp_text" name="inp_text" placeholder="Введите текст для озвучки" style="width: 50%;">
+          </div>
+          <br>
+         <input type ="submit" class="btn btn-light"/>
+      </form>
+</div>
+
+{% endblock %}
+
+{%block footer%}
+{{super()}}
+{%endblock%}
