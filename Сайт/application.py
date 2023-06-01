@@ -127,6 +127,49 @@ def uploader():  # обработчик
         clear_folder('./files')
         return render_template('uploader.html', s_name=s_name, text=text_)  # возвращаем страницу конвертора
 
+    
+    
+    
+def transffile(file_name,playback_speed,logged_user=False):
+    inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
+    print(playback_speed)
+    pdf_to_audio(inputFile_name, playbackspeed=playback_speed)  # Производим конвертацию
+    file_name = Path(file_name).stem  # Вырезаем имя файла
+    time_stamp = str(datetime.now())
+    if logged_user:
+        user_id = logged_user.id
+        print(file_name, time_stamp, user_id)
+        new_file = File(file_name=file_name, file_date=time_stamp, file_owner=user_id)
+        session_db = Session()  # Выполняем запись в бд
+        session_db.add(new_file)
+        session_db.commit()
+    time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
+    if logged_user:
+        print('Данные: ', new_file.file_name, new_file.file_date)
+    return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
+
+
+@application.route('/textloader', methods=['GET', 'POST'])  # Страница с конвертором
+def textloader():  # обработчик
+    global playback_speed
+    if request.method == 'POST':  # Проверка на запрос с методом POST
+        clear_folder('./files')
+        text = str(request.form['inp_text']).strip()  # Проверяем записи в текстовом поле
+        if text == "":  # Пустое поле
+            print('Empty input')
+            error = 'Текстовое поле не было заполнено!'
+            return render_template('textloader.html', error=error)
+        else:
+            file_name = 'Text_to_audio_service'+str(time.time())+'.txt'  # создаём файл с текстом из поля
+            with open(f'./{file_name}', 'w') as f:
+                f.write(text)
+            print(f'Create file {file_name} for text from textblock')
+        print(f'[&] {file_name}')  # вывод в консоль для отладки
+        return transffile(file_name,playback_speed)
+    if request.method == 'GET':  # Проверка запроса с методом GET
+        clear_folder('./files')
+        return render_template('textloader.html')  # возвращаем страницу конвертора
+
 
 @application.route('/register', methods=['POST', 'GET'])  # Объявление нужных методов
 def registration():
