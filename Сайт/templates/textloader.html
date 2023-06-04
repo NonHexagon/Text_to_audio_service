@@ -10,11 +10,19 @@
 
 </div>
 <div>
-      <form action = "http://localhost:5000/textloader" method = "POST"
+      <form action = "/textloader" method = "POST"
          enctype = "multipart/form-data">
           <div>
               <label><h3 class="me-3 py-2 text-light text-decoration-none">Ввести текст</h3></label><br>
-            <input type="text" id="inp_text" name="inp_text" placeholder="Введите текст для озвучки" style="width: 50%;">
+            <input type="text" class="textloader" id="inp_text" name="inp_text" placeholder="Введите текст для озвучки" style="width: 50%;" maxlength="86"><br>
+              <small class="me-3 py-2 text-light text-decoration-none">Ограничение по длине в 86 символов</small><br>
+              <label>Пример текста</label><br>
+              <h4 class="me-3 py-2 text-light text-decoration-none">How long how long will I slide
+Separate my side I don't<br>
+I don't believe it's bad <br>
+Slit my throat<br>
+It's all I ever
+              </h4>
           </div>
           <br>
          <input type ="submit" class="btn btn-light"/>
