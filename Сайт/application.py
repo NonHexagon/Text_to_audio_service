@@ -16,7 +16,6 @@ from flask_login import *
 from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
 from datetime import datetime, timedelta
 
-
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////First.db'  # инициализация базы данных в проекте
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # игнорируем не работающую часть пакета (она нам не нужна)
@@ -53,11 +52,13 @@ def settings():  # поиск обращений к определенному �
         mail = str(request.form['reset_mail'])
         tmp_passwd = str(generate_password())
         playback_speed = request.form['audio_speed']
+        print(playback_speed)
         if (playback_speed != 0 or playback_speed != '') and playback_speed.isnumeric():
             print('got this', type(playback_speed))
             playback_speed = int(playback_speed)
             return redirect('/uploader')
-        elif mail != '':
+        if mail != '':
+            print(mail)
             reset_passwd(mail)
             return redirect('/login')
         elif type(playback_speed) == str:
@@ -100,7 +101,7 @@ def uploader():  # обработчик
                 error = 'Файл для конвертации отсутствует или строка не была заполнена!'
                 return render_template('uploader.html', s_name=s_name, text=text_, error=error)
             else:
-                file_name = 'Text_to_audio_service'+str(time.time())+'.txt'  # создаём файл с текстом из поля
+                file_name = 'Text_to_audio_service' + str(time.time()) + '.txt'  # создаём файл с текстом из поля
                 with open(f'./{file_name}', 'w') as f:
                     f.write(text)
                 print(f'Create file {file_name} for text from textblock')
@@ -127,10 +128,8 @@ def uploader():  # обработчик
         clear_folder('./files')
         return render_template('uploader.html', s_name=s_name, text=text_)  # возвращаем страницу конвертора
 
-    
-    
-    
-def transffile(file_name,playback_speed,logged_user=False):
+
+def transffile(file_name, playback_speed, logged_user=False):
     inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
     print(playback_speed)
     pdf_to_audio(inputFile_name, playbackspeed=playback_speed)  # Производим конвертацию
@@ -160,12 +159,12 @@ def textloader():  # обработчик
             error = 'Текстовое поле не было заполнено!'
             return render_template('textloader.html', error=error)
         else:
-            file_name = 'Text_to_audio_service'+str(time.time())+'.txt'  # создаём файл с текстом из поля
+            file_name = 'Text_to_audio_service' + str(time.time()) + '.txt'  # создаём файл с текстом из поля
             with open(f'./{file_name}', 'w') as f:
                 f.write(text)
             print(f'Create file {file_name} for text from textblock')
         print(f'[&] {file_name}')  # вывод в консоль для отладки
-        return transffile(file_name,playback_speed)
+        return transffile(file_name, playback_speed)
     if request.method == 'GET':  # Проверка запроса с методом GET
         clear_folder('./files')
         return render_template('textloader.html')  # возвращаем страницу конвертора
@@ -239,7 +238,7 @@ def account():
     files_ = get_files(logged_user.id)
     if request.method == 'GET':
         return render_template('account.html', name=name, user=user, l_name=l_name,
-                               tables=[files_.to_html(classes='data', header='true', index=False, justify='center')])
+                               tables=[files_.to_html(classes='data', header='true', index=False, justify='center')], files_=files_)
 
 
 @application.route('/logout', methods=['GET', 'POST'])
@@ -259,4 +258,4 @@ def redirect_to_sing_in(response):
 
 if __name__ == '__main__':  # Создаем точку доступа
     port = int(os.environ.get("PORT", 5000))
-    application.run(host='0.0.0.0', port=port, debug=False)  # Запускаем приложение без опции дебага
+    application.run(host='0.0.0.0', port=port, debug=True)  # Запускаем приложение без опции дебага

@@ -8,6 +8,7 @@ DataBase = sqlite3.connect('main.db', check_same_thread=False)
 cursor = DataBase.cursor()
 
 
+
 def login_check(user_email: str, user_passwd: str) -> bool | str:
     db_email = cursor.execute("SELECT email FROM users").fetchall()
     container = []
@@ -84,18 +85,26 @@ def get_user_class_email(user_email: str) -> DataBase:
 
 
 def reset_passwd(user_mail: str,):
-    passwd_1 = generate_password()
-    next_date = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_mail}'").fetchall()
-    cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{user_mail}'")
-    cursor.execute(f"UPDATE users SET timestamp = next_time WHERE email == '{user_mail}'")
-    cursor.execute(f"UPDATE users SET next_time = '{datetime.now() + timedelta(minutes=120)}'\
-    WHERE email == '{user_mail}'")
-    DataBase.commit()
-    print(f'Пароль сброшен и выслан на почту \033[36m{user_mail}\033[0m!\
-    \033[36mСледующее изменение в {datetime.now() + timedelta(minutes=120)}\033[0m')
-    trunner = threading.Thread(send_message(user_mail, passwd_1))
-    trunner.start()
-    trunner.join()
+    mailboxes_query = cursor.execute("SELECT email FROM users").fetchall()
+    mailboxes = []
+    for i in range(len(mailboxes_query)):
+        mailboxes.append(mailboxes_query[i][0])
+    if user_mail in mailboxes:
+        print('in')
+        passwd_1 = generate_password()
+        next_date = cursor.execute(f"SELECT next_time FROM users WHERE email == '{user_mail}'").fetchall()
+        cursor.execute(f"UPDATE users SET tmp_passwd = '{passwd_1}' WHERE email == '{user_mail}'")
+        cursor.execute(f"UPDATE users SET timestamp = next_time WHERE email == '{user_mail}'")
+        cursor.execute(f"UPDATE users SET next_time = '{datetime.now() + timedelta(minutes=120)}'\
+        WHERE email == '{user_mail}'")
+        DataBase.commit()
+        print(f'Пароль сброшен и выслан на почту \033[36m{user_mail}\033[0m!\
+        \033[36mСледующее изменение в {datetime.now() + timedelta(minutes=120)}\033[0m')
+        trunner = threading.Thread(send_message(user_mail, passwd_1))
+        trunner.start()
+        trunner.join()
+    else:
+        return print('User with this email is not exist')
 
 
 def get_files(user_id):
