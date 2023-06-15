@@ -1,5 +1,4 @@
 import pytest
-import os
 base_url = 'http://127.0.0.1:5000/'
 
 
@@ -15,9 +14,18 @@ neFiles = (
     pytest.param('neTest.txt', marks=pytest.mark.xfail(reason='Не поддерживаемый формат файла')),
     pytest.param('neTest.jpg', marks=pytest.mark.xfail(reason='Не поддерживаемый формат файла'))
 )
-file_size_1 = os.path.getsize('C:\\Users\\miste\\Downloads\\Text_to_Audio\\files\\posTest.mp3')
-file_size_2 = os.path.getsize('C:\\Users\\miste\\Downloads\\Text_to_Audio\\files\\posTest_Ru.mp3')
-file_size_3 = os.path.getsize('C:\\Users\\miste\\Downloads\\Text_to_Audio\\files\\neTest_dif.mp3')
-file_size_4 = os.path.getsize('C:\\Users\\miste\\Downloads\\Text_to_Audio\\files\\posTestEn.mp3')
-uploader_test_data = [('posTest.docx', base_url, (200, f'{file_size_1}', 'attachment; filename=posTest.mp3', 'audio/mpeg')), ('posTest_Ru.docx', base_url, (200, f'{file_size_2}', 'attachment; filename=posTest_Ru.mp3', 'audio/mpeg')), ('posTestEn.pdf', base_url, (200, f'{file_size_4}', 'attachment; filename=posTestEn.mp3', 'audio/mpeg'))]
+uploader_test_data = [('posTest.docx', base_url, (200,  'text/html; charset=utf-8')),
+                      ('posTest_Ru.docx', base_url, (200, 'text/html; charset=utf-8')),
+                      ('posTestEn.pdf', base_url, (200,  'text/html; charset=utf-8'))]
+
+demo_test_data = [('No more defending the lie behind a never-ending war', (True)),
+                  ('Вася - Хороший человек, но на пары не ходит', (True)),
+                  ('', (False))]
+
+login_data = [('mister22898@mail.ru', 'NiRBbl8Y', 'uploader'),
+              ('201932@edu.fa.ru', 'gWb5lbhn', 'uploader'),
+              ('fakeemail@mail.ru', '23453212', 'register')]
+
+logout_data = [('mister22898@mail.ru', 'NiRBbl8Y', 'main'),
+               ('201932@edu.fa.ru', 'gWb5lbhn', 'main')]
 
