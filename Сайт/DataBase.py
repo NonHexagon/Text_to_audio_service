@@ -1,15 +1,13 @@
 import sqlite3  # импорт движка базы данных
 from flask_login import UserMixin, login_manager, LoginManager
-from sqlite3 import Error  # импортируем отдельно модуль ошибки (для удобства использования)
-import sqlalchemy  # импортируем ORM
-from datetime import timedelta
+
 from sqlalchemy.orm import declarative_base, sessionmaker  # Импортируем необходимые модули дял сборки базы данных
 from sqlalchemy import create_engine  # модуль который и будет производить сборку
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Boolean  # Типы данных для бд
 from sqlalchemy import Sequence  # Вот что это - не помню
-import os  # модуль для работы с операционной системой
 
-Base = declarative_base()  # Создаем экземпляр класса declarative_base, позволяющий работать с таблицей как с объектом класса
+
+Base = declarative_base()  # Создаем экземпляр класса declarative_base
 engine = create_engine('sqlite:///main.db', echo=False)  # Генерим базу данных
 Session = sessionmaker(bind=engine)  # Экземпляр класса сессий
 
@@ -41,10 +39,3 @@ class File(Base):  # Таблица файлов
 
 
 Base.metadata.create_all(engine)  # Создаем движок для работы с бд и создаем саму бд
-
-
-def get_user_name(mail_address: str) -> str:  # Функция поллучения имени пользователя из бд по почтовому ящику
-    DB = sqlite3.connect('main.db', check_same_thread=False)
-    cursor = DB.cursor()
-    user_name = cursor.execute(f"SELECT user_name FROM users WHERE email == '{mail_address}'").fetchall()
-    return str(user_name[0][0])
