@@ -10,75 +10,69 @@ import pdfplumber  # модуль для чтения pdf файлов
 import pyttsx3  # модуль для озвучки текса (используя голоса операционной системы)
 
 
-def pdf_to_audio(file_path='/', playbackspeed=120):  # Функция для запуска конвертора в отдельном процессе
-    p = Process(target=pdf_to_audio_processor(file_path, playbackspeed))  # инициализация процесса
-    p.start()  # запуск процесса
-    p.join()  # завершение процесса
+class Converter:
+    def __init__(self, playback_speed):
+        self.audio = pyttsx3.init()
+        self.voices = self.audio.getProperty('voices')
+        self.playback_speed = playback_speed
 
+    def file_to_audio(self, file_path):
+        p = Process(target=self.file_to_audio_proc(file_path))
+        p.start()
+        p.join()
 
-audio = pyttsx3.init()
+    def text_processor(self, doc_text, file_path):
+        lang = langid.classify(doc_text)[0]
+        self.audio.setProperty('rate', self.playback_speed)
+        for voice in self.voices:
+            current_lang = str(voice.name).split('-')[1][0:3].lower().strip()
+            if str(lang) == current_lang:
+                self.audio.setProperty('voice', voice.id)
 
+        file_name = Path(file_path).stem
+        self.audio.save_to_file(doc_text, f'files/{file_name}.mp3')
+        self.audio.runAndWait()
+        os.remove(file_path)
+        return print(f'[+] {file_name} has been converted to audio!')
 
-def work_with_text(doc_text, file_path, playbackspeed):  # конвертор
-    print(playbackspeed)
-    print(doc_text)  # вывод строки
-    lang = langid.classify(doc_text)[0]  # определение языка текста
-    # инициализация чтения
-    print(lang)  # вывод языка
-    audio.setProperty('rate', playbackspeed)
-    ru = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_RU-RU_IRINA_11.0'  # читалка на русском
-    en = 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0'  # читалка на англ
+    def file_to_audio_proc(self, file_path='./'):
+        root = Tk()
+        if Path(file_path).is_file() and Path(file_path).suffix == '.pdf':
+            print(f'[!] {Path(file_path).stem} is converting...\nStand by...')
+            root.bell()
+            with pdfplumber.PDF(open(file=file_path, mode='rb')) as pdf:
+                pages = [pages.extract_text() for pages in pdf.pages]
+            doc_text = ''.join(pages).replace('\n', ' ')
+            return self.text_processor(doc_text, file_path)
 
-    if lang == 'en':  # проверка языка текста
-        audio.setProperty('voice', en)  # используем соответствующий язык читалки
-    if lang == 'ru':
-        audio.setProperty('voice', ru)
-    file_name = Path(file_path).stem  # получаем название файла
-    audio.save_to_file(doc_text, f'files/{file_name}.mp3')  # указываем куда сохранить данные
-    audio.runAndWait()  # запускаем читалку
-    os.remove(file_path)  # удаляем исходный файл
-    return print(f'[+] {file_name} has been converted to audio!')  # маркер готовности файла
+        elif Path(file_path).is_file() and Path(file_path).suffix == '.docx':
+            print(f'[!] {Path(file_path).stem} is converting...\nStand by...')
+            root.bell()
+            doc_text = str(docx2txt.process(file_path)).replace('\n', ' ')
+            return self.text_processor(doc_text, file_path)
 
+        elif Path(file_path).is_file() and Path(file_path).suffix == '.txt':
+            print(f'[!] {Path(file_path).stem} is converting...\nStand by...')
+            root.bell()
+            with open(file_path, 'r', encoding='utf-8') as f:
+                doc_text = f.read()
+            doc_text = doc_text.replace('\n', ' ')
+            return self.text_processor(doc_text, file_path)
 
-def clear_folder(path: str):
-    folder = path
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+        else:
+            root.bell()
+            return print('[!] File not found!')
 
+    def clear_folder(self, path: str):
+        folder = path
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
 
-def pdf_to_audio_processor(file_path='./', playbackspeed=120):  # Считывает файл и вызывает конвертор
-    root = Tk()
-    if Path(file_path).is_file() and Path(file_path).suffix == '.pdf':  # проверка на pdf файл
-        print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
-        with pdfplumber.PDF(open(file=file_path, mode='rb')) as pdf:  # чтение файла
-            pages = [pages.extract_text() for pages in pdf.pages]  # переносим все в одну строку
-        doc_text = ''.join(pages).replace('\n', ' ')
-        return work_with_text(doc_text, file_path, playbackspeed)
-
-    elif Path(file_path).is_file() and Path(file_path).suffix == '.docx':  # проверка на docx файл
-        print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
-        doc_text = str(docx2txt.process(file_path)).replace('\n', ' ')  # переносим все в одну строку
-        root.bell()
-        return work_with_text(doc_text, file_path, playbackspeed)
-    elif Path(file_path).is_file() and Path(file_path).suffix == '.txt':  # проверка на txt файл
-        print(f'[!] {Path(file_path).stem} is processing...')  # маркер начала конвертации
-        with open(file_path, 'r') as f:
-            doc_text = f.read()
-        doc_text = doc_text.replace('\n', ' ')  # переносим все в одну строку
-        return work_with_text(doc_text, file_path, playbackspeed)
-    else:  # если файл не был найден или не имеет поддерживаемого расширения
-        root.bell()
-        return print('[!] File not found')  # выводим в консоль сообщение
-
-
-if __name__ == "__main__":  # создаем точку доступа
-    p = Process(target=pdf_to_audio_processor('./californication.docx', 120))  # инициализируем процесс для проверки
-    p.start()  # запускаем процесс
-    p.join()  # завершаем процесс
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f'Failed to delete {file_path}. Reason {e}')
+        return print(f'Папка {folder} очищена')
