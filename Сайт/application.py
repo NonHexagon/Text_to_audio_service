@@ -2,18 +2,15 @@ import os
 import time  # Импортируем модуль времени
 import random
 import threading
-import Example_texts
 from workwithpsswordandemail import send_message, generate_password
 from multiprocessing import Process  # модуль для создания отдельных процессов
-from DB_manager import login_check, user_mails, reset_passwd, get_user_class_id, get_user_class_email, get_files
+from DB_manager import login_check, reset_passwd, get_user_class_uni, get_files
 from Example_texts import songs_dict
-import pandas as pd
 from DataBase import Users, File, Session
 from pathlib import Path  # модуль для работы с путями, но нам нужен только инструмент для файлов
-from main import pdf_to_audio, clear_folder  # модуль для конвертации
+from main import Converter  # модуль для конвертации
 from flask import *  # модуль для создания веб-приложений
 from flask_login import *
-from flask_sqlalchemy import SQLAlchemy  # пакет ORM СУБД
 from datetime import datetime, timedelta
 
 application = Flask(__name__)  # инициализация экземпляра класса веб-приложения на котором будем собирать проект
@@ -25,8 +22,9 @@ login_manager.init_app(application)
 playback_speed = 0
 logged_user = Users()
 
+conv = Converter(playback_speed=120)
 
-@application.route('/home', methods=['GET'])  # прописываем пути для достижения домашней страницы
+
 @application.route('/', methods=['GET'])
 @application.route('/main', methods=['GET'])
 @application.route('/main_page', methods=['GET'])
@@ -44,6 +42,7 @@ def index():  # отлов запроса к странице индекса
 def guide():  # отлов путей
     return render_template('guide.html')  # возврат страницы
 
+
 @application.route('/settings', methods=['GET', 'POST'])  # путь к странице с настройками
 def settings():  # поиск обращений к определенному пути
     if request.method == 'POST':
@@ -55,8 +54,7 @@ def settings():  # поиск обращений к определенному �
         if (playback_speed != 0 or playback_speed != '') and playback_speed.isnumeric():
             print('got this', type(playback_speed))
             playback_speed = int(playback_speed)
-            if mail == '':
-                return redirect('/uploader')
+            return redirect('/uploader')
         if mail != '':
             print(mail)
             reset_passwd(mail)
@@ -75,29 +73,12 @@ def about():  # обработчик пути
 @application.route('/reset_passwd', methods=['GET'])
 def reset():
     global logged_user
-    p = Process(target=reset_passwd(logged_user.email[0]))  # инициализация процесса
+    print(logged_user.email)
+    p = Process(target=reset_passwd(logged_user.email))  # инициализация процесса
     p.start()  # запуск процесса
     p.join()  # завершение процесса
     return redirect('/login')
 
-
-def transffile(file_name, playback_speed, logged_user=False):
-    inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
-    print(playback_speed)
-    pdf_to_audio(inputFile_name, playbackspeed=playback_speed)  # Производим конвертацию
-    file_name = Path(file_name).stem  # Вырезаем имя файла
-    time_stamp = str(datetime.now())
-    if logged_user:
-        user_id = logged_user.id
-        print(file_name, time_stamp, user_id)
-        new_file = File(file_name=file_name, file_date=time_stamp, file_owner=user_id)
-        session_db = Session()  # Выполняем запись в бд
-        session_db.add(new_file)
-        session_db.commit()
-    time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
-    if logged_user:
-        print('Данные: ', new_file.file_name, new_file.file_date)
-    return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
 
 @application.route('/uploader', methods=['GET', 'POST'])  # Страница с конвертором
 @login_required
@@ -107,7 +88,7 @@ def uploader():  # обработчик
     s_name = str(random.choice(keys_arr)).title()
     text_ = songs_dict.get(s_name)
     if request.method == 'POST':  # Проверка на запрос с методом POST
-        clear_folder('./files')
+        #clear_folder('./files')
         file = request.files['file']  # получаем файл
         file_name = file.filename
         try:
@@ -128,20 +109,51 @@ def uploader():  # обработчик
             print('True')
             return send_file(f'easter_egg/{Path(file_name).stem}.mp3', as_attachment=True)
         else:
-            return transffile(file_name, playback_speed, logged_user=logged_user)
+            inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
+            print(playback_speed)
+            conv.playback_speed = playback_speed
+            conv.file_to_audio(inputFile_name)  # Производим конвертацию
+            file_name = Path(file_name).stem  # Вырезаем имя файла
+            time_stamp = str(datetime.now())
+            user_id = logged_user.id
+            print(file_name, time_stamp, user_id)
+            new_file = File(file_name=file_name, file_date=time_stamp, file_owner=user_id)
+            session_db = Session()  # Выполняем запись в бд
+            session_db.add(new_file)
+            session_db.commit()
+            time.sleep(2)  # Ожидаем 5 секунд, на случай объемных файлов
+            print('Данные: ', new_file.file_name, new_file.file_date)
+            return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
     if request.method == 'GET':  # Проверка запроса с методом GET
-        clear_folder('./files')
+        conv.clear_folder('./files')
         return render_template('uploader.html', s_name=s_name, text=text_)  # возвращаем страницу конвертора
 
 
-
+def transffile(file_name, playback_speed, logged_user=False):
+    inputFile_name = (f'./{file_name}')  # Добавляем необходимые символы для работы конвертора
+    print(playback_speed)
+    conv.playback_speed = playback_speed
+    conv.file_to_audio(inputFile_name)  # Производим конвертацию
+    file_name = Path(file_name).stem  # Вырезаем имя файла
+    time_stamp = str(datetime.now())
+    if logged_user:
+        user_id = logged_user.id
+        print(file_name, time_stamp, user_id)
+        new_file = File(file_name=file_name, file_date=time_stamp, file_owner=user_id)
+        session_db = Session()  # Выполняем запись в бд
+        session_db.add(new_file)
+        session_db.commit()
+    time.sleep(5)  # Ожидаем 5 секунд, на случай объемных файлов
+    if logged_user:
+        print('Данные: ', new_file.file_name, new_file.file_date)
+    return send_file(f'files/{file_name}.mp3', as_attachment=True)  # Возврат получившегося файла
 
 
 @application.route('/textloader', methods=['GET', 'POST'])  # Страница с конвертором
 def textloader():  # обработчик
     global playback_speed
     if request.method == 'POST':  # Проверка на запрос с методом POST
-        clear_folder('./files')
+        conv.clear_folder('./files')
         text = str(request.form['inp_text']).strip()  # Проверяем записи в текстовом поле
         if text == "":  # Пустое поле
             print('Empty input')
@@ -155,7 +167,7 @@ def textloader():  # обработчик
         print(f'[&] {file_name}')  # вывод в консоль для отладки
         return transffile(file_name, playback_speed)
     if request.method == 'GET':  # Проверка запроса с методом GET
-        clear_folder('./files')
+        conv.clear_folder('./files')
         return render_template('textloader.html')  # возвращаем страницу конвертора
 
 
@@ -180,7 +192,7 @@ def registration():
             session_db = Session()  # Выполняем запись в бд
             session_db.add(new_user)
             session_db.commit()
-            threading.Thread(target=(send_message(email, tmp_passwd)))
+            threading.Thread(target=(send_message(email, tmp_passwd, user_name)))
             print(f'Был добавлен новый пользователь: {l_name} {f_name} с ником {user_name}')
         except AttributeError:  # Обработка ошибки атрибутов (иногда случается)
             return 'Что-то пошло не так!'
@@ -194,10 +206,10 @@ def registration():
 def load_user(user):
     global logged_user
     user_ = list(user)
-    print(type(user_))
-    print(user_[1])
-    user_fin = int(user_[1])
-    logged_user = get_user_class_id(user_id=user_fin)
+    print(type(user_[0]))
+    print(user_[0])
+    user_fin = int(user_[0])
+    logged_user = get_user_class_uni(user_fin)
     return logged_user
 
 
@@ -210,7 +222,7 @@ def login():
         input_passwd = str(request.form['tmp_passwd'])
         input_email = str(request.form['email'])
         if login_check(input_email, input_passwd):
-            logged_user = get_user_class_email(input_email)
+            logged_user = get_user_class_uni(user_email=input_email)
             login_user(logged_user)
             return redirect('/uploader')
         else:
@@ -221,13 +233,14 @@ def login():
 @login_required
 def account():
     global logged_user
-    name = logged_user.f_name[0]
-    user = logged_user.user_name[0]
-    l_name = logged_user.l_name[0]
+    name = logged_user.f_name
+    user = logged_user.user_name
+    l_name = logged_user.l_name
     files_ = get_files(logged_user.id)
     if request.method == 'GET':
         return render_template('account.html', name=name, user=user, l_name=l_name,
-                               tables=[files_.to_html(classes='data', header='true', index=False, justify='center')], files_=files_)
+                               tables=[files_.to_html(classes='data', header='true', index=False, justify='center')],
+                               files_=files_)
 
 
 @application.route('/logout', methods=['GET', 'POST'])
@@ -246,5 +259,6 @@ def redirect_to_sing_in(response):
 
 
 if __name__ == '__main__':  # Создаем точку доступа
-    port = int(os.environ.get("PORT", 5000))
-    application.run(host='0.0.0.0', port=port, debug=False)  # Запускаем приложение без опции дебага
+    port = int(os.environ.get("PORT", 5050))
+    application.run(host='0.0.0.0', port=port, debug=True)  # Запускаем приложение без опции дебага
+
